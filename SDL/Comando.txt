@@ -1,3 +1,8 @@
 Windows: gcc main.c -IC:\SDL2\include -LC:\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -mwindows -o main.exe
 Linux: gcc main.c $(sdl2-config --cflags --libs) -o main
+	./main
+Árbol fractal:
+	gcc -o arbol_fractal arbol_fractal.c -lSDL2 -lm
+	./arbol_fractal
+
 
