@@ -32,6 +32,7 @@ void vga_plot_pixel(int x, int y, unsigned short color);
 
 extern unsigned char g_320x200x256[];
 void write_regs(unsigned char *regs);
+
 // end copied code
 
 #endif

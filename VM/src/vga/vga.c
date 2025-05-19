@@ -2,6 +2,7 @@
 #include "../kernel/kernel.h"
 #include "../screen/screen.h"
 
+
 #define COLOR_BLACK 0x0
 #define COLOR_GREEN 0x2
 #define COLOR_RED 0x4
@@ -27,28 +28,85 @@ unsigned char g_320x200x256[] =
 	0x41, 0x00, 0x0F, 0x00,	0x00
 };
 
+// =======================
+// FUNCIONES AUXILIARES
+// =======================
+
+// Convierte grados a miliradianes (1 rad ≈ 57.3°)
+int deg_to_millirad(int deg) {
+    return deg * 3142 / 180;  // π ≈ 3.142
+}
+
+// sin(x) en miliradianes, devuelve sin(x) * 1000
+int sin_millirad(int x) {
+    int x3 = (x * x / 1000) * x / 1000;
+    int x5 = (x3 * x / 1000) * x / 1000;
+    return x - x3 / 6 + x5 / 120;
+}
+
+// cos(x) en miliradianes, devuelve cos(x) * 1000
+int cos_millirad(int x) {
+    int x2 = (x * x) / 1000;
+    int x4 = (x2 * x2) / 1000;
+    return 1000 - x2 / 2 + x4 / 24;
+}
+
+int sin_deg(int deg) {
+    int rad = deg_to_millirad(deg);
+    return sin_millirad(rad);
+}
+
+int cos_deg(int deg) {
+    int rad = deg_to_millirad(deg);
+    return cos_millirad(rad);
+}
 void vga_test() {
     println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clear_screen();
+    for (int d = 1; d <= 6; d++) {
+        vga_clear_screen();
+
+        draw_tree(160, 190, 60, 90, d); // centro inferior, hacia arriba
+
+        // Delay rudimentario
+        for (volatile int i = 0; i < 82000000; i++) {}
+    }
+
 	// draw rectangle
-	draw_rectangle(100, 100, 100, 50);
-	// draw some faces
-	//draw_happy_face(10,10);
-	//draw_happy_face(100,100);
-	//draw_happy_face(300,150);
-	// bounds
-	//vga_plot_pixel(0, 0, 15);
-	//vga_plot_pixel(319, 199, COLOR_PURPLE);
-	// see some colors
-	//for (int i = 0; i < 15; i++) {
-	//	for (int j = 0; j < 100; j++) {
-	//		vga_plot_pixel(i, 50+j, i);
-	//	}
-	//}
+	//draw_rect(100, 100, 100, 50);
+	//draw_circle(160, 100, 40);
+	//draw_line(50, 10, 50, 100);
+	//draw_tree(160, 180, 40, 90, 5);
+
+	
+
 }
 
-void draw_rectangle(int x, int y, int width, int height) {
+void draw_mandala(int cx, int cy, int radius, int num_lines) {
+    for (int i = 0; i < num_lines; i++) {
+        int angle = i * 360 / num_lines;
+        int rad = deg_to_millirad(angle);
+        int dx = (radius * cos_millirad(rad)) / 1000;
+        int dy = (radius * sin_millirad(rad)) / 1000;
+        draw_line(cx, cy, cx + dx, cy - dy);  // Y hacia arriba
+    }
+}
+
+
+void draw_circle(int xc, int yc, int r) {
+    for (int x = xc - r; x <= xc + r; x++) {
+        for (int y = yc - r; y <= yc + r; y++) {
+            int dx = x - xc;
+            int dy = y - yc;
+            if (dx * dx + dy * dy <= r * r) {
+                vga_plot_pixel(x, y, COLOR_GREEN);  // o el color que desees
+            }
+        }
+    }
+}
+
+void draw_rect(int x, int y, int width, int height) {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			vga_plot_pixel(x+i, y+j, COLOR_RED);
@@ -56,24 +114,49 @@ void draw_rectangle(int x, int y, int width, int height) {
 	}
 }
 
-void draw_happy_face(int x, int y) {
-	// eye
-	vga_plot_pixel(x,y,COLOR_PURPLE);
-	// eye
-	vga_plot_pixel(x+10,y,COLOR_PURPLE);
-	// mouth
-	vga_plot_pixel(x,	y+8,COLOR_PURPLE);
-	vga_plot_pixel(x+1,	y+9,COLOR_PURPLE);
-	vga_plot_pixel(x+2,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+3,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+4,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+5,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+6,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+7,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+8,	y+10,COLOR_PURPLE);
-	vga_plot_pixel(x+9,	y+9,COLOR_PURPLE);
-	vga_plot_pixel(x+10,y+8,COLOR_PURPLE);
+void draw_line(int x0, int y0, int x1, int y1) {
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    int steps = dx > dy ? dx : dy;
+    if (steps < 0) steps = -steps;
+    if (steps == 0) {
+        vga_plot_pixel(x0, y0, COLOR_GREEN);
+        return;
+    }
+
+    for (int i = 0; i <= steps; i++) {
+        int x = x0 + (i * dx) / steps;
+        int y = y0 + (i * dy) / steps;
+        vga_plot_pixel(x, y, COLOR_GREEN);
+    }
 }
+
+// =======================
+// ÁRBOL FRACTAL RECURSIVO
+// =======================
+
+void draw_tree(int x1, int y1, int length, int angle, int depth) {
+    if (depth == 0 || length <= 0)
+        return;
+
+    int dx = (length * cos_deg(angle)) / 1000;
+    int dy = (length * sin_deg(angle)) / 1000;
+
+    int x2 = x1 + dx;
+    int y2 = y1 - dy;
+
+    draw_line(x1, y1, x2, y2);
+
+    draw_tree(x2, y2, length * 7 / 10, angle - 25, depth - 1);
+    draw_tree(x2, y2, length * 7 / 10, angle + 25, depth - 1);
+}
+
+
+
+
+
+
 
 void vga_clear_screen() {
     // Note: "clear_screen" name conflicted with something in screen.h
