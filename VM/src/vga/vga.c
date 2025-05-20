@@ -4,12 +4,18 @@
 #include "../screen/screen.h"
 
 
+#define TICKS_PER_MS 200
+
 /* Prototipos previos */
 void io_wait(void);
 void tree(int x, int y, double len, double ang, int depth);
 void animate_tree(int x, int y, double length, double angle, int max_depth);
-void draw_mandala_frame(int cx, int cy, int r, int t);
-void animate_mandala(int cx, int cy, int r, int t);
+void draw_mandala_frame(int cx, int cy,int t);
+void animate_mandala(int cx, int cy);
+void wait_ticks(int ticks);
+void wait_ms(int ms);
+void animate_spiral(int cx, int cy, int radius_max);
+void draw_spiral_frame(int cx, int cy, int t_max);
 
 
 // =======================
@@ -96,12 +102,11 @@ void vga_test() {
 	//draw_rect(100, 100, 100, 50);
 	//draw_circle(160, 100, 40);
 	//draw_line(50, 10, 50, 100);
-     animate_mandala(160, 100, 10, 5);
+     //animate_mandala(99, 70);
+    animate_spiral(160, 100, 200);
 
     // Mantener el último fotograma un rato
     for (volatile long i = 0; i < 5000000; i++);
-
-	
 
 }
 
@@ -136,15 +141,16 @@ void animate_tree(int x, int y, double length, double angle, int max_depth) {
     for (int depth = 1; depth <= max_depth; depth++) {
         vga_clear_screen();
         tree(x, y, length, angle, depth);
-        io_wait();  // pequeña pausa
+        wait_ms(100);
     }
 }
 
-void draw_mandala_frame(int cx, int cy, int r, int t) {
+void draw_mandala_frame(int cx, int cy,int t) {
     unsigned char c;
+    int r;
 
     // 1) Círculos concéntricos de radio 20, 40, …, 180
-    for (r = 20; r < 200; r += 20) {
+    for (r = 10; r < 200; r += 20) {
         if ((r / 20) % 2 == 0) {
             c = COLOR_YELLOW;
         } else {
@@ -162,22 +168,72 @@ void draw_mandala_frame(int cx, int cy, int r, int t) {
         if (r % 30 == 0) {
             c = COLOR_MAGENTA;
         } else {
-            c = COLOR_WHITE;
+            c = COLOR_BLACK;
         }
         set_color(c);
         vga_plot_pixel(x, y);
+        wait_ms(150);
     }
 }
 
-void animate_mandala(int cx, int cy, int r, int t) {
-    for (t = 0; t < 360; t += 10) {
+void animate_mandala(int cx, int cy) {
+    int t;
+    for (t = 0; t < 180; t += 10) {
         vga_clear_screen();
-        draw_mandala_frame(cx, cy, r, t);
-        io_wait();   // breve pausa para suavizar la animación
+        draw_mandala_frame(cx, cy, t);
+        wait_ms(150);
     }
+    vga_clear_screen();
+    draw_mandala_frame(cx, cy, 350);
+   
 }
 
 
+void draw_spiral_frame(int cx, int cy, int r_max) {
+    int r;
+    int r_min = 2; 
+    int r_step = 2;
+    unsigned char c;
+    for (r = r_max; r >= r_min; r -= r_step) {
+
+        // Asignar color según t % 3
+        switch (r % 3) {
+            case 0: c = COLOR_RED;    break;
+            case 1: c = COLOR_BLUE;   break;
+            default: c = COLOR_GREEN; break;
+        }
+        set_color(c);
+        draw_circle(cx, cy,r);
+        wait_ms(1);  // pequeño retraso para suavizar
+    }
+}
+
+/**
+ * animate_spiral:
+ *   Anima la espiral creciendo hasta radio máximo radius,
+ *   limpiando pantalla y redibujando cada paso.
+ */
+void animate_spiral(int cx, int cy, int radius_max) {
+    int t;
+    for (t = 0; t <= radius_max; t += 5) {
+        vga_clear_screen();
+        draw_spiral_frame(cx, cy, t);
+        wait_ms(1);  // retardo entre fotogramas
+    }
+    // Para dejar la espiral completa sin borrar
+    draw_spiral_frame(cx, cy, radius_max);
+}
+
+
+void wait_ticks(int ticks) {
+    for (volatile int i = 0; i < ticks; i++) {
+        io_wait();
+    }
+}
+
+void wait_ms(int ms) {
+    wait_ticks(ms * TICKS_PER_MS);
+}
 
 
 // Implementación de io_wait: un simple retraso por puertos
