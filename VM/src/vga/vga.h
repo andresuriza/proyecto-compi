@@ -5,7 +5,7 @@
 
 void vga_test();
 void vga_clear_screen();
-void vga_plot_pixel(int x, int y, unsigned short color);
+
 
 // Begin copied code
 // Source: https://files.osdev.org/mirrors/geezer/osd/graphics/modes.c

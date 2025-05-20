@@ -1,32 +1,16 @@
 #include "vga.h"
+#include "vga_color.h"
 #include "../kernel/kernel.h"
 #include "../screen/screen.h"
 
 
-#define COLOR_BLACK 0x0
-#define COLOR_GREEN 0x2
-#define COLOR_RED 0x4
-#define COLOR_PURPLE 0xf
+/* Prototipos previos */
+void io_wait(void);
+void tree(int x, int y, double len, double ang, int depth);
+void animate_tree(int x, int y, double length, double angle, int max_depth);
+void draw_mandala_frame(int cx, int cy, int r, int t);
+void animate_mandala(int cx, int cy, int r, int t);
 
-unsigned char g_320x200x256[] =
-{
-/* MISC */
-	0x63,
-/* SEQ */
-	0x03, 0x01, 0x0F, 0x00, 0x0E,
-/* CRTC */
-	0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
-	0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x9C, 0x0E, 0x8F, 0x28,	0x40, 0x96, 0xB9, 0xA3,
-	0xFF,
-/* GC */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
-	0xFF,
-/* AC */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	0x41, 0x00, 0x0F, 0x00,	0x00
-};
 
 // =======================
 // FUNCIONES AUXILIARES
@@ -60,75 +44,75 @@ int cos_deg(int deg) {
     int rad = deg_to_millirad(deg);
     return cos_millirad(rad);
 }
+
+#define PI 3.14159265358979323846
+static inline double deg2rad(double d) {
+    return d * PI / 180.0;
+}
+static inline int abs_i(int x) { return x < 0 ? -x : x; }
+/* Taylor simple para sin/cos */
+static double sin_approx(double x) {
+    double x2 = x*x;
+    return x - x*x2/6.0 + x2*x2/120.0 - x2*x2*x2/5040.0;
+}
+static double cos_approx(double x) {
+    return sin_approx(PI/2 - x);
+}
+
+unsigned char g_320x200x256[] =
+{
+/* MISC */
+	0x63,
+/* SEQ */
+	0x03, 0x01, 0x0F, 0x00, 0x0E,
+/* CRTC */
+	0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
+	0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x9C, 0x0E, 0x8F, 0x28,	0x40, 0x96, 0xB9, 0xA3,
+	0xFF,
+/* GC */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
+	0xFF,
+/* AC */
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+	0x41, 0x00, 0x0F, 0x00,	0x00
+};
+
+
+//Principal
 void vga_test() {
     println("Attempting to switch modes...", 29);
     write_regs(g_320x200x256);
     vga_clear_screen();
-    for (int d = 1; d <= 6; d++) {
-        vga_clear_screen();
 
-        draw_tree(160, 190, 60, 90, d); // centro inferior, hacia arriba
-
-        // Delay rudimentario
-        for (volatile int i = 0; i < 82000000; i++) {}
-    }
-
+    //set_color(COLOR_GREEN);
+    //vga_draw_line(10,10,100,50);
+    
+    //animate_tree(160, 199, 60.0, 90.0, 6);
+    // Mantener la pantalla un rato
+    //for (volatile long i = 0; i < 10000000; i++);
 	// draw rectangle
 	//draw_rect(100, 100, 100, 50);
 	//draw_circle(160, 100, 40);
 	//draw_line(50, 10, 50, 100);
-	//draw_tree(160, 180, 40, 90, 5);
+     animate_mandala(160, 100, 10, 5);
+
+    // Mantener el último fotograma un rato
+    for (volatile long i = 0; i < 5000000; i++);
 
 	
 
 }
 
-void draw_mandala(int cx, int cy, int radius, int num_lines) {
-    for (int i = 0; i < num_lines; i++) {
-        int angle = i * 360 / num_lines;
-        int rad = deg_to_millirad(angle);
-        int dx = (radius * cos_millirad(rad)) / 1000;
-        int dy = (radius * sin_millirad(rad)) / 1000;
-        draw_line(cx, cy, cx + dx, cy - dy);  // Y hacia arriba
-    }
-}
 
 
-void draw_circle(int xc, int yc, int r) {
-    for (int x = xc - r; x <= xc + r; x++) {
-        for (int y = yc - r; y <= yc + r; y++) {
-            int dx = x - xc;
-            int dy = y - yc;
-            if (dx * dx + dy * dy <= r * r) {
-                vga_plot_pixel(x, y, COLOR_GREEN);  // o el color que desees
-            }
-        }
-    }
-}
 
-void draw_rect(int x, int y, int width, int height) {
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
-			vga_plot_pixel(x+i, y+j, COLOR_RED);
-		}
-	}
-}
-
-void draw_line(int x0, int y0, int x1, int y1) {
-    int dx = x1 - x0;
-    int dy = y1 - y0;
-
-    int steps = dx > dy ? dx : dy;
-    if (steps < 0) steps = -steps;
-    if (steps == 0) {
-        vga_plot_pixel(x0, y0, COLOR_GREEN);
-        return;
-    }
-
-    for (int i = 0; i <= steps; i++) {
-        int x = x0 + (i * dx) / steps;
-        int y = y0 + (i * dy) / steps;
-        vga_plot_pixel(x, y, COLOR_GREEN);
+unsigned char color_by_depth(int depth) {
+    switch (depth % 3) {
+        case 0: return COLOR_GREEN;
+        case 1: return COLOR_RED;
+        default: return COLOR_PURPLE;
     }
 }
 
@@ -136,43 +120,73 @@ void draw_line(int x0, int y0, int x1, int y1) {
 // ÁRBOL FRACTAL RECURSIVO
 // =======================
 
-void draw_tree(int x1, int y1, int length, int angle, int depth) {
-    if (depth == 0 || length <= 0)
-        return;
-
-    int dx = (length * cos_deg(angle)) / 1000;
-    int dy = (length * sin_deg(angle)) / 1000;
-
-    int x2 = x1 + dx;
-    int y2 = y1 - dy;
-
-    draw_line(x1, y1, x2, y2);
-
-    draw_tree(x2, y2, length * 7 / 10, angle - 25, depth - 1);
-    draw_tree(x2, y2, length * 7 / 10, angle + 25, depth - 1);
+void tree(int x1, int y1, double length, double angle, int depth) {
+    if (!depth) return;
+    double rad = deg2rad(angle);
+    int x2 = x1 + (int)(length * cos_approx(rad));
+    int y2 = y1 - (int)(length * sin_approx(rad));
+    unsigned char col = color_by_depth(depth);
+    set_color(color_by_depth(depth));
+    vga_draw_line(x1, y1, x2, y2);
+    tree(x2, y2, length * 0.7, angle - 25.0, depth - 1);
+    tree(x2, y2, length * 0.7, angle + 25.0, depth - 1);
 }
 
-
-
-
-
-
-
-void vga_clear_screen() {
-    // Note: "clear_screen" name conflicted with something in screen.h
-    // Now I see why namespacing is a thing
-    for (int i = 0; i < 320; i++) {
-        for (int j = 0; j < 200; j++) {
-            vga_plot_pixel(i,j,COLOR_BLACK);
-        }
+void animate_tree(int x, int y, double length, double angle, int max_depth) {
+    for (int depth = 1; depth <= max_depth; depth++) {
+        vga_clear_screen();
+        tree(x, y, length, angle, depth);
+        io_wait();  // pequeña pausa
     }
 }
 
-void vga_plot_pixel(int x, int y, unsigned short color) {
-    unsigned short offset = x + 320 * y;
-    unsigned char *VGA = (unsigned char*) VGA_ADDRESS;
-    VGA[offset] = color;
+void draw_mandala_frame(int cx, int cy, int r, int t) {
+    unsigned char c;
+
+    // 1) Círculos concéntricos de radio 20, 40, …, 180
+    for (r = 20; r < 200; r += 20) {
+        if ((r / 20) % 2 == 0) {
+            c = COLOR_YELLOW;
+        } else {
+            c = COLOR_CYAN;
+        }
+        set_color(c);
+        draw_circle(cx, cy, r);
+    }
+
+    // 2) Píxeles radiales giratorios, r = 0..190 paso 10
+    for (r = 0; r < 200; r += 10) {
+        double ang = deg2rad(t + r);
+        int x = cx + (int)(r * cos_approx(ang));
+        int y = cy - (int)(r * sin_approx(ang));  // y crece hacia abajo en VGA
+        if (r % 30 == 0) {
+            c = COLOR_MAGENTA;
+        } else {
+            c = COLOR_WHITE;
+        }
+        set_color(c);
+        vga_plot_pixel(x, y);
+    }
 }
+
+void animate_mandala(int cx, int cy, int r, int t) {
+    for (t = 0; t < 360; t += 10) {
+        vga_clear_screen();
+        draw_mandala_frame(cx, cy, r, t);
+        io_wait();   // breve pausa para suavizar la animación
+    }
+}
+
+
+
+
+// Implementación de io_wait: un simple retraso por puertos
+void io_wait(void) {
+    // Los puertos 0x80 suelen usarse para retraso breve en x86
+    __asm__ volatile ( "outb %%al, $0x80" : : "a"(0) );
+}
+
+
 
 // Begin copied code
 // Source: https://files.osdev.org/mirrors/geezer/osd/graphics/modes.c

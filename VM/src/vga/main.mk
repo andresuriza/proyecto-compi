@@ -1,3 +1,9 @@
+# main.mk
+
 dir := src/vga
 
-OBJ_FILES += ${dir}/vga.o
+# Lista de objetos VGA
+OBJ_FILES += \
+    ${dir}/vga.o \
+    ${dir}/vga_color.o    
+
