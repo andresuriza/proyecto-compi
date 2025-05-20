@@ -95,7 +95,7 @@ void vga_test() {
     //set_color(COLOR_GREEN);
     //vga_draw_line(10,10,100,50);
     
-    //animate_tree(160, 199, 60.0, 90.0, 6);
+    animate_tree(160, 199, 70, 90, 9);
     // Mantener la pantalla un rato
     //for (volatile long i = 0; i < 10000000; i++);
 	// draw rectangle
@@ -103,7 +103,7 @@ void vga_test() {
 	//draw_circle(160, 100, 40);
 	//draw_line(50, 10, 50, 100);
      //animate_mandala(99, 70);
-    animate_spiral(160, 100, 200);
+    //animate_spiral(160, 100, 200);
 
     // Mantener el último fotograma un rato
     for (volatile long i = 0; i < 5000000; i++);
@@ -116,8 +116,8 @@ void vga_test() {
 unsigned char color_by_depth(int depth) {
     switch (depth % 3) {
         case 0: return COLOR_GREEN;
-        case 1: return COLOR_RED;
-        default: return COLOR_PURPLE;
+        case 1: return COLOR_BROWN;
+        default: return COLOR_YELLOW;
     }
 }
 
@@ -141,7 +141,7 @@ void animate_tree(int x, int y, double length, double angle, int max_depth) {
     for (int depth = 1; depth <= max_depth; depth++) {
         vga_clear_screen();
         tree(x, y, length, angle, depth);
-        wait_ms(100);
+        wait_ms(10000);
     }
 }
 
