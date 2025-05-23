@@ -92,10 +92,10 @@ void vga_test() {
     write_regs(g_320x200x256);
     vga_clear_screen();
 
-    //set_color(COLOR_GREEN);
-    //vga_draw_line(10,10,100,50);
+    set_color(COLOR_GREEN);
+    vga_draw_line(10,10,100,50);
     
-    animate_tree(160, 199, 70, 90, 9);
+    //animate_tree(160, 199, 70, 90, 9);
     // Mantener la pantalla un rato
     //for (volatile long i = 0; i < 10000000; i++);
 	// draw rectangle
@@ -106,7 +106,7 @@ void vga_test() {
     //animate_spiral(160, 100, 200);
 
     // Mantener el último fotograma un rato
-    for (volatile long i = 0; i < 5000000; i++);
+    //for (volatile long i = 0; i < 5000000; i++);
 
 }
 
