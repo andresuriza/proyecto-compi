@@ -1,0 +1,21 @@
+(int) x;
+(color) c;
+
+frame {
+ loop (t = 0; t < 360; t = t + 5) {
+
+ x = 320;
+ y = 240;
+
+ if (t == 0) { 
+    c = rojo; 
+  }
+
+   else if (t == 1) { c = azul; }
+ else { c = verde; }
+ setcolor(c);
+ draw pixel(x, y);
+ wait(1);
+
+ }
+}
