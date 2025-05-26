@@ -3,7 +3,7 @@
 
 #define VGA_ADDRESS 0xA0000
 
-void vga_test();
+
 void vga_clear_screen();
 
 
