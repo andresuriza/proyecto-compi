@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o CMakeFiles/vgraph_ide.dir/main.cpp.o -o vgraph_ide  /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13 -lqtermwidget5 -lQt5Widgets -lQt5Gui -lQt5Core -lutf8proc /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13 /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.15.13 
