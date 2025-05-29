@@ -69,11 +69,17 @@
 /* First part of user prologue.  */
 #line 1 "vgraph.y"
 
-#include <stdio.h>
+void yyerror (char *s);
 int yylex();
-void yyerror(const char *s);
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <math.h>
+int symbols[52];
+int symbolVal(char symbol);
+void updateSymbolVal(char symbol, int val);
 
-#line 77 "vgraph.tab.c"
+#line 83 "vgraph.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -104,47 +110,55 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_IDENT = 3,                      /* IDENT  */
-  YYSYMBOL_NUMBER = 4,                     /* NUMBER  */
-  YYSYMBOL_FUNC = 5,                       /* FUNC  */
-  YYSYMBOL_LPAR = 6,                       /* LPAR  */
-  YYSYMBOL_RPAR = 7,                       /* RPAR  */
-  YYSYMBOL_LCURLY = 8,                     /* LCURLY  */
-  YYSYMBOL_RCURLY = 9,                     /* RCURLY  */
-  YYSYMBOL_INT = 10,                       /* INT  */
-  YYSYMBOL_COLOR = 11,                     /* COLOR  */
-  YYSYMBOL_COLORTYP = 12,                  /* COLORTYP  */
-  YYSYMBOL_COORD = 13,                     /* COORD  */
-  YYSYMBOL_SEMICOLON = 14,                 /* SEMICOLON  */
-  YYSYMBOL_EQUALS = 15,                    /* EQUALS  */
-  YYSYMBOL_SHAPEFOUR = 16,                 /* SHAPEFOUR  */
-  YYSYMBOL_SHAPETHREE = 17,                /* SHAPETHREE  */
-  YYSYMBOL_SHAPETWO = 18,                  /* SHAPETWO  */
-  YYSYMBOL_DRAW = 19,                      /* DRAW  */
-  YYSYMBOL_COMMA = 20,                     /* COMMA  */
-  YYSYMBOL_SETCOLOR = 21,                  /* SETCOLOR  */
-  YYSYMBOL_WAIT = 22,                      /* WAIT  */
-  YYSYMBOL_FRAME = 23,                     /* FRAME  */
-  YYSYMBOL_LOOP = 24,                      /* LOOP  */
-  YYSYMBOL_LT = 25,                        /* LT  */
-  YYSYMBOL_GT = 26,                        /* GT  */
-  YYSYMBOL_PLUS = 27,                      /* PLUS  */
-  YYSYMBOL_IF = 28,                        /* IF  */
-  YYSYMBOL_ELSE = 29,                      /* ELSE  */
-  YYSYMBOL_YYACCEPT = 30,                  /* $accept  */
-  YYSYMBOL_program = 31,                   /* program  */
-  YYSYMBOL_functions = 32,                 /* functions  */
-  YYSYMBOL_frame = 33,                     /* frame  */
-  YYSYMBOL_body = 34,                      /* body  */
-  YYSYMBOL_loop = 35,                      /* loop  */
-  YYSYMBOL_condition = 36,                 /* condition  */
-  YYSYMBOL_if = 37,                        /* if  */
-  YYSYMBOL_else = 38,                      /* else  */
-  YYSYMBOL_elseif = 39,                    /* elseif  */
-  YYSYMBOL_drawing = 40,                   /* drawing  */
-  YYSYMBOL_setcolor = 41,                  /* setcolor  */
-  YYSYMBOL_wait = 42,                      /* wait  */
-  YYSYMBOL_declaration = 43                /* declaration  */
+  YYSYMBOL_IDENTIFIER = 3,                 /* IDENTIFIER  */
+  YYSYMBOL_FUNC = 4,                       /* FUNC  */
+  YYSYMBOL_INT = 5,                        /* INT  */
+  YYSYMBOL_COLOR = 6,                      /* COLOR  */
+  YYSYMBOL_COORD = 7,                      /* COORD  */
+  YYSYMBOL_LINE = 8,                       /* LINE  */
+  YYSYMBOL_RECT = 9,                       /* RECT  */
+  YYSYMBOL_CIRCLE = 10,                    /* CIRCLE  */
+  YYSYMBOL_PIXEL = 11,                     /* PIXEL  */
+  YYSYMBOL_SETCOLOR = 12,                  /* SETCOLOR  */
+  YYSYMBOL_WAIT = 13,                      /* WAIT  */
+  YYSYMBOL_FRAME = 14,                     /* FRAME  */
+  YYSYMBOL_LOOP = 15,                      /* LOOP  */
+  YYSYMBOL_LT = 16,                        /* LT  */
+  YYSYMBOL_GT = 17,                        /* GT  */
+  YYSYMBOL_PLUS = 18,                      /* PLUS  */
+  YYSYMBOL_IF = 19,                        /* IF  */
+  YYSYMBOL_ELSE = 20,                      /* ELSE  */
+  YYSYMBOL_MODULUS = 21,                   /* MODULUS  */
+  YYSYMBOL_DRAW = 22,                      /* DRAW  */
+  YYSYMBOL_END = 23,                       /* END  */
+  YYSYMBOL_MOVE = 24,                      /* MOVE  */
+  YYSYMBOL_ANIMATE = 25,                   /* ANIMATE  */
+  YYSYMBOL_COS = 26,                       /* COS  */
+  YYSYMBOL_SIN = 27,                       /* SIN  */
+  YYSYMBOL_INTEGER = 28,                   /* INTEGER  */
+  YYSYMBOL_FLOAT = 29,                     /* FLOAT  */
+  YYSYMBOL_30_ = 30,                       /* ';'  */
+  YYSYMBOL_31_ = 31,                       /* '{'  */
+  YYSYMBOL_32_ = 32,                       /* '}'  */
+  YYSYMBOL_33_ = 33,                       /* '='  */
+  YYSYMBOL_34_ = 34,                       /* '('  */
+  YYSYMBOL_35_ = 35,                       /* ')'  */
+  YYSYMBOL_36_ = 36,                       /* ','  */
+  YYSYMBOL_37_ = 37,                       /* '+'  */
+  YYSYMBOL_38_ = 38,                       /* '-'  */
+  YYSYMBOL_39_ = 39,                       /* '*'  */
+  YYSYMBOL_40_ = 40,                       /* '/'  */
+  YYSYMBOL_YYACCEPT = 41,                  /* $accept  */
+  YYSYMBOL_line = 42,                      /* line  */
+  YYSYMBOL_frame = 43,                     /* frame  */
+  YYSYMBOL_body = 44,                      /* body  */
+  YYSYMBOL_assignment = 45,                /* assignment  */
+  YYSYMBOL_var_declare = 46,               /* var_declare  */
+  YYSYMBOL_wait = 47,                      /* wait  */
+  YYSYMBOL_loop = 48,                      /* loop  */
+  YYSYMBOL_set_color = 49,                 /* set_color  */
+  YYSYMBOL_draw_shape = 50,                /* draw_shape  */
+  YYSYMBOL_float_r = 51                    /* float_r  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -261,7 +275,7 @@ typedef int yytype_uint16;
 
 
 /* Stored state numbers (used for stacks). */
-typedef yytype_uint8 yy_state_t;
+typedef yytype_int8 yy_state_t;
 
 /* State numbers in computations.  */
 typedef int yy_state_fast_t;
@@ -470,18 +484,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  12
+#define YYFINAL  13
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   132
+#define YYLAST   122
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  30
+#define YYNTOKENS  41
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  14
+#define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  34
+#define YYNRULES  35
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  139
+#define YYNSTATES  100
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   284
@@ -502,15 +516,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+      34,    35,    39,    37,    36,    38,     2,    40,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    30,
+       2,    33,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    31,     2,    32,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -531,12 +545,12 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    40,    41,    43,    45,    46,    47,    48,
-      49,    50,    51,    52,    53,    55,    58,    59,    60,    62,
-      64,    66,    69,    72,    75,    78,    81,    82,    84,    86,
-      88,    89,    90,    92,    93
+       0,    59,    59,    60,    61,    64,    65,    68,    69,    70,
+      71,    72,    73,    74,    75,    76,    77,    78,    81,    86,
+      87,    90,    91,    92,    95,    96,    99,   102,   105,   108,
+     111,   114,   117,   120,   141,   142
 };
 #endif
 
@@ -552,13 +566,13 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "IDENT", "NUMBER",
-  "FUNC", "LPAR", "RPAR", "LCURLY", "RCURLY", "INT", "COLOR", "COLORTYP",
-  "COORD", "SEMICOLON", "EQUALS", "SHAPEFOUR", "SHAPETHREE", "SHAPETWO",
-  "DRAW", "COMMA", "SETCOLOR", "WAIT", "FRAME", "LOOP", "LT", "GT", "PLUS",
-  "IF", "ELSE", "$accept", "program", "functions", "frame", "body", "loop",
-  "condition", "if", "else", "elseif", "drawing", "setcolor", "wait",
-  "declaration", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "IDENTIFIER", "FUNC",
+  "INT", "COLOR", "COORD", "LINE", "RECT", "CIRCLE", "PIXEL", "SETCOLOR",
+  "WAIT", "FRAME", "LOOP", "LT", "GT", "PLUS", "IF", "ELSE", "MODULUS",
+  "DRAW", "END", "MOVE", "ANIMATE", "COS", "SIN", "INTEGER", "FLOAT",
+  "';'", "'{'", "'}'", "'='", "'('", "')'", "','", "'+'", "'-'", "'*'",
+  "'/'", "$accept", "line", "frame", "body", "assignment", "var_declare",
+  "wait", "loop", "set_color", "draw_shape", "float_r", YY_NULLPTR
 };
 
 static const char *
@@ -568,12 +582,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-26)
+#define YYPACT_NINF (-50)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-1)
+#define YYTABLE_NINF (-21)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -582,20 +596,16 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       7,    13,    30,    12,    22,   -26,   -26,     7,    11,    24,
-      39,     5,   -26,   -26,    33,    34,    46,    47,    21,    45,
-      48,    49,    50,     4,    43,     5,     5,     5,     5,     5,
-       5,     5,     5,   -26,   -26,     2,    28,    51,    52,    53,
-       6,    56,    58,    59,     5,    57,   -26,   -26,   -26,   -26,
-     -26,   -26,   -26,   -26,   -26,   -26,    60,   -26,    54,    61,
-      63,    41,    62,    64,    65,    38,    10,    66,    67,    59,
-      68,    70,    55,    69,    71,    72,    73,    74,    76,    75,
-      78,    77,    81,    86,   -26,    79,   -26,   -26,    91,    92,
-      94,    95,   -26,   -26,   -26,    84,    96,   -26,   -26,     5,
-      93,    82,    83,    97,    98,   103,   -26,    99,     5,   105,
-     106,   100,   101,    87,   -26,   104,   102,   109,   -26,   -26,
-     113,   -26,   114,   107,   110,   112,   -26,   117,   111,   108,
-     -26,   123,    80,   124,   120,   121,     5,   122,   -26
+      38,   -25,   -21,   -16,     4,    18,   -50,     0,   -50,     8,
+      48,    -3,     2,   -50,    13,   -50,   -25,     6,    10,    11,
+      83,    16,    26,    28,   -50,    32,    34,    43,    62,   -50,
+      64,    45,    52,    47,    49,    51,    53,   -25,   -50,    59,
+      65,   -50,    66,    67,   -50,   -50,   -50,   -50,   -50,   -50,
+      44,    63,   -50,    69,    -8,    -8,    -8,    -8,   -50,   -50,
+     -50,   -50,   -50,   -50,    52,   -50,   -50,    68,    70,    71,
+      72,    73,    -8,    -8,    -8,    -8,    52,    74,    75,    76,
+      78,    79,    -8,    -8,    -8,   -50,    84,    80,    81,    85,
+      48,    -8,    -8,   -50,    56,    86,    87,   -50,   -50,   -50
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -603,111 +613,101 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     2,     4,     0,     0,     0,
-       0,    14,     1,     3,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    14,    14,    14,    14,    14,
-      14,    14,    14,    30,    31,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    14,     0,     5,     6,     7,     8,
-       9,    10,    12,    13,    11,    33,     0,    34,     0,     0,
+       0,     6,     0,     0,     0,     0,     2,     0,    19,     0,
+       0,     0,     0,     1,     0,    18,    17,     0,     0,     0,
+       0,     0,     0,     0,     9,     0,     0,     0,     0,     4,
+       0,     0,     0,     0,     0,     0,     0,    27,     5,     0,
+       0,    14,     0,     0,     7,     8,    10,    11,    21,    22,
+       0,     0,    20,     0,     0,     0,     0,     0,    12,    13,
+      15,    16,    28,    24,     0,    34,    35,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    20,     0,    29,    32,     0,     0,
-       0,     0,    27,    26,    28,     0,     0,    17,    16,    14,
-       0,     0,     0,     0,     0,     0,    18,     0,    14,     0,
-       0,     0,     0,     0,    19,     0,     0,     0,    25,    24,
-       0,    21,     0,     0,     0,     0,    23,     0,     0,     0,
-      22,     0,     0,     0,     0,     0,    14,     0,    15
+       0,     0,     0,     0,     0,    29,     0,     0,     0,     0,
+       0,     0,     0,    32,     0,     0,     0,    26,    30,    31
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -26,   -26,   125,   -26,   -25,   -26,    -1,   -26,   -26,   -26,
-     -26,   -26,   -26,    14
+     -50,    88,   -50,    15,   -10,   -50,   -20,   -19,   -18,   -17,
+     -49
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     4,     5,     6,    24,    25,    67,    26,    27,    28,
-      29,    30,    31,    32
+       0,     5,     6,    21,     7,     8,    23,    24,    25,    26,
+      67
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule whose
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_uint8 yytable[] =
+static const yytype_int8 yytable[] =
 {
-      47,    48,    49,    50,    51,    52,    53,    54,     1,    62,
-       1,     2,    44,     2,     7,    14,    55,    56,    63,    68,
-      11,     7,    12,    15,    18,    80,    19,    20,     8,    21,
-       3,    16,    45,    22,    23,    81,    82,    37,    38,    39,
-       9,    10,    57,    58,    74,    75,    17,    33,    34,    35,
-      36,    40,    46,    79,    41,    42,    43,    59,    60,    61,
-      64,    65,    66,    69,    70,    72,    71,    73,    85,    76,
-       0,    77,    78,    83,   107,    88,    84,     0,     0,    95,
-       0,    97,    86,   115,    87,    98,   100,    92,    93,    89,
-      94,    90,    91,    96,    99,   101,   102,   103,   105,   104,
-     106,   108,   109,   110,   111,   112,   113,   133,   114,   116,
-     117,   137,   120,   121,   118,   119,   123,   124,   125,   128,
-     129,   126,   122,   131,   127,   130,   132,   135,   134,   136,
-       0,   138,    13
+      22,    40,    41,    42,    43,   -20,    68,    69,    70,    11,
+      12,    39,     9,    -3,     1,    10,     2,    37,    13,     2,
+      65,    66,    53,    77,    78,    79,    80,     3,    17,    18,
+      14,    19,    27,    87,    88,    89,    15,    28,    20,     1,
+      30,     2,    95,    96,    31,    32,    48,     4,    38,    16,
+       4,     2,     3,    52,    71,     2,    44,    37,    45,     2,
+      17,    18,    46,    19,    47,    49,    81,    50,    17,    18,
+      20,    19,     4,    51,    40,    41,    42,    43,    20,    62,
+      22,    54,     4,    55,    39,    56,     4,    57,    97,    58,
+       4,    33,    34,    35,    36,    59,    60,    61,    63,    64,
+       0,     0,    29,    76,    72,    94,    73,    74,    75,     0,
+      82,    83,    84,    85,    86,    90,    91,    92,     0,     0,
+      93,    98,    99
 };
 
-static const yytype_int16 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-      25,    26,    27,    28,    29,    30,    31,    32,     3,     3,
-       3,     6,     8,     6,     0,     4,    14,    15,    12,    44,
-       8,     7,     0,    12,    19,    15,    21,    22,    15,    24,
-      23,     7,    28,    28,    29,    25,    26,    16,    17,    18,
-      10,    11,    14,    15,     3,     4,     7,    14,    14,     3,
-       3,     6,     9,    15,     6,     6,     6,     6,     6,     6,
-       4,     3,     3,     6,     4,     4,    12,     4,    69,     7,
-      -1,     7,     7,     7,    99,    20,     9,    -1,    -1,     4,
-      -1,     4,    14,   108,    14,     4,     7,    14,    14,    20,
-      14,    20,    20,    15,     8,     4,     4,     3,    14,     4,
-       4,     8,    20,    20,     7,     7,     3,    27,     9,     4,
-       4,   136,    25,     9,    14,    14,     7,     4,     4,     7,
-       3,    14,    20,    15,    14,    14,     3,     7,     4,     8,
-      -1,     9,     7
+      10,    21,    21,    21,    21,    30,    55,    56,    57,     5,
+       6,    21,    33,     0,     1,    31,     3,     1,     0,     3,
+      28,    29,    32,    72,    73,    74,    75,    14,    12,    13,
+      30,    15,    35,    82,    83,    84,    28,    35,    22,     1,
+      34,     3,    91,    92,    34,    34,     3,    34,    32,     1,
+      34,     3,    14,     1,    64,     3,    30,     1,    30,     3,
+      12,    13,    30,    15,    30,     3,    76,     3,    12,    13,
+      22,    15,    34,    28,    94,    94,    94,    94,    22,    35,
+      90,    34,    34,    34,    94,    34,    34,    34,    32,    30,
+      34,     8,     9,    10,    11,    30,    30,    30,    35,    30,
+      -1,    -1,    14,    30,    36,    90,    36,    36,    36,    -1,
+      36,    36,    36,    35,    35,    31,    36,    36,    -1,    -1,
+      35,    35,    35
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     6,    23,    31,    32,    33,    43,    15,    10,
-      11,     8,     0,    32,     4,    12,     7,     7,    19,    21,
-      22,    24,    28,    29,    34,    35,    37,    38,    39,    40,
-      41,    42,    43,    14,    14,     3,     3,    16,    17,    18,
-       6,     6,     6,     6,     8,    28,     9,    34,    34,    34,
-      34,    34,    34,    34,    34,    14,    15,    14,    15,     6,
-       6,     6,     3,    12,     4,     3,     3,    36,    34,     6,
-       4,    12,     4,     4,     3,     4,     7,     7,     7,    15,
-      15,    25,    26,     7,     9,    36,    14,    14,    20,    20,
-      20,    20,    14,    14,    14,     4,    15,     4,     4,     8,
-       7,     4,     4,     3,     4,    14,     4,    34,     8,    20,
-      20,     7,     7,     3,     9,    34,     4,     4,    14,    14,
-      25,     9,    20,     7,     4,     4,    14,    14,     7,     3,
-      14,    15,     3,    27,     4,     7,     8,    34,     9
+       0,     1,     3,    14,    34,    42,    43,    45,    46,    33,
+      31,     5,     6,     0,    30,    28,     1,    12,    13,    15,
+      22,    44,    45,    47,    48,    49,    50,    35,    35,    42,
+      34,    34,    34,     8,     9,    10,    11,     1,    32,    45,
+      47,    48,    49,    50,    30,    30,    30,    30,     3,     3,
+       3,    28,     1,    45,    34,    34,    34,    34,    30,    30,
+      30,    30,    35,    35,    30,    28,    29,    51,    51,    51,
+      51,    45,    36,    36,    36,    36,    30,    51,    51,    51,
+      51,    45,    36,    36,    36,    35,    35,    51,    51,    51,
+      31,    36,    36,    35,    44,    51,    51,    32,    35,    35
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    30,    31,    32,    32,    33,    34,    34,    34,    34,
-      34,    34,    34,    34,    34,    35,    36,    36,    36,    37,
-      38,    39,    40,    40,    40,    40,    41,    41,    42,    43,
-      43,    43,    43,    43,    43
+       0,    41,    42,    42,    42,    43,    43,    44,    44,    44,
+      44,    44,    44,    44,    44,    44,    44,    44,    45,    45,
+      45,    46,    46,    46,    47,    47,    48,    48,    49,    50,
+      50,    50,    50,    50,    51,    51
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     4,     2,     2,     2,     2,
-       2,     2,     2,     2,     0,    19,     3,     3,     4,     7,
-       4,     8,    12,    10,     8,     8,     5,     5,     5,     7,
-       4,     4,     7,     5,     5
+       0,     2,     1,     2,     3,     4,     1,     2,     2,     1,
+       2,     2,     3,     3,     2,     3,     3,     1,     3,     1,
+       1,     4,     4,     1,     4,     1,    11,     1,     4,     7,
+      11,    11,     9,     1,     1,     1
 };
 
 
@@ -1170,206 +1170,225 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* program: functions  */
-#line 38 "vgraph.y"
-                   {printf("program -> functions\n");}
+  case 2: /* line: frame  */
+#line 59 "vgraph.y"
+            {printf("Program finished executing \n");}
 #line 1177 "vgraph.tab.c"
     break;
 
-  case 3: /* functions: declaration functions  */
-#line 40 "vgraph.y"
-                                 {printf("functions -> declaration functions\n");}
+  case 3: /* line: assignment ';'  */
+#line 60 "vgraph.y"
+                         {;}
 #line 1183 "vgraph.tab.c"
     break;
 
-  case 4: /* functions: frame  */
-#line 41 "vgraph.y"
-                 {printf("functions -> frame\n");}
+  case 4: /* line: assignment ';' line  */
+#line 61 "vgraph.y"
+                          {;}
 #line 1189 "vgraph.tab.c"
     break;
 
-  case 5: /* frame: FRAME LCURLY body RCURLY  */
-#line 43 "vgraph.y"
-                                {printf("frame -> FRAME LCURLY body RCURLY\n");}
+  case 5: /* frame: FRAME '{' body '}'  */
+#line 64 "vgraph.y"
+                          {printf("Executing frame \n");}
 #line 1195 "vgraph.tab.c"
     break;
 
-  case 6: /* body: loop body  */
-#line 45 "vgraph.y"
-                  {printf("body -> loop\n");}
+  case 6: /* frame: error  */
+#line 65 "vgraph.y"
+                 { fprintf(stderr, "Syntax error in frame \n"); yyerror; }
 #line 1201 "vgraph.tab.c"
     break;
 
-  case 7: /* body: if body  */
-#line 46 "vgraph.y"
-                  {printf("functions -> drawing functions\n");}
+  case 7: /* body: assignment ';'  */
+#line 68 "vgraph.y"
+                     {;}
 #line 1207 "vgraph.tab.c"
     break;
 
-  case 8: /* body: else body  */
-#line 47 "vgraph.y"
-                    {printf("functions -> drawing functions\n");}
+  case 8: /* body: wait ';'  */
+#line 69 "vgraph.y"
+                   {;}
 #line 1213 "vgraph.tab.c"
     break;
 
-  case 9: /* body: elseif body  */
-#line 48 "vgraph.y"
-                      {printf("functions -> drawing functions\n");}
+  case 9: /* body: loop  */
+#line 70 "vgraph.y"
+               {;}
 #line 1219 "vgraph.tab.c"
     break;
 
-  case 10: /* body: drawing body  */
-#line 49 "vgraph.y"
-                       {printf("functions -> drawing functions\n");}
+  case 10: /* body: set_color ';'  */
+#line 71 "vgraph.y"
+                        {;}
 #line 1225 "vgraph.tab.c"
     break;
 
-  case 11: /* body: declaration body  */
-#line 50 "vgraph.y"
-                           {printf("declaration -> declaration functions\n");}
+  case 11: /* body: draw_shape ';'  */
+#line 72 "vgraph.y"
+                         {;}
 #line 1231 "vgraph.tab.c"
     break;
 
-  case 12: /* body: setcolor body  */
-#line 51 "vgraph.y"
-                        {printf("declaration -> setcolor functions\n");}
+  case 12: /* body: body assignment ';'  */
+#line 73 "vgraph.y"
+                              {;}
 #line 1237 "vgraph.tab.c"
     break;
 
-  case 13: /* body: wait body  */
-#line 52 "vgraph.y"
-                    {printf("declaration -> wait functions\n");}
+  case 13: /* body: body wait ';'  */
+#line 74 "vgraph.y"
+                        {;}
 #line 1243 "vgraph.tab.c"
     break;
 
-  case 14: /* body: %empty  */
-#line 53 "vgraph.y"
-                 {printf("frame -> empty\n");}
+  case 14: /* body: body loop  */
+#line 75 "vgraph.y"
+                    {;}
 #line 1249 "vgraph.tab.c"
     break;
 
-  case 15: /* loop: LOOP LPAR IDENT EQUALS NUMBER SEMICOLON IDENT LT NUMBER SEMICOLON IDENT EQUALS IDENT PLUS NUMBER RPAR LCURLY body RCURLY  */
-#line 56 "vgraph.y"
-    {printf("loop -> LOOP LPAR IDENT EQUALS NUMBER SEMICOLON IDENT LT NUMBER SEMICOLON IDENT EQUALS IDENT PLUS NUMBER RPAR LCURLY body RCURLY\n");}
+  case 15: /* body: body set_color ';'  */
+#line 76 "vgraph.y"
+                             {;}
 #line 1255 "vgraph.tab.c"
     break;
 
-  case 16: /* condition: IDENT GT NUMBER  */
-#line 58 "vgraph.y"
-                           {printf("condition -> IDENT GT NUMBER \n");}
+  case 16: /* body: body draw_shape ';'  */
+#line 77 "vgraph.y"
+                              {;}
 #line 1261 "vgraph.tab.c"
     break;
 
-  case 17: /* condition: IDENT LT NUMBER  */
-#line 59 "vgraph.y"
-                             {printf("condition -> IDENT LT NUMBER \n");}
+  case 17: /* body: error  */
+#line 78 "vgraph.y"
+                { fprintf(stderr, "Syntax error in body \n"); yyerror; }
 #line 1267 "vgraph.tab.c"
     break;
 
-  case 18: /* condition: IDENT EQUALS EQUALS NUMBER  */
-#line 60 "vgraph.y"
-                                        {printf("condition -> IDENT EQUALS EQUALS NUMBER  \n");}
-#line 1273 "vgraph.tab.c"
-    break;
-
-  case 19: /* if: IF LPAR condition RPAR LCURLY body RCURLY  */
-#line 62 "vgraph.y"
-                                              {printf("if -> IF LPAR condition RPAR LCURLY body RCURLY \n");}
-#line 1279 "vgraph.tab.c"
-    break;
-
-  case 20: /* else: ELSE LCURLY body RCURLY  */
-#line 64 "vgraph.y"
-                              {printf("else -> ELSE LCURLY body RCURLY \n");}
-#line 1285 "vgraph.tab.c"
-    break;
-
-  case 21: /* elseif: ELSE IF LPAR condition RPAR LCURLY body RCURLY  */
-#line 67 "vgraph.y"
-        {printf("elseif -> ELSE IF LPAR condition RPAR LCURLY body RCURLY \n");}
-#line 1291 "vgraph.tab.c"
-    break;
-
-  case 22: /* drawing: DRAW SHAPEFOUR LPAR NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER RPAR SEMICOLON  */
-#line 70 "vgraph.y"
-         {printf("drawing -> DRAW SHAPE LPAR NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER RPAR SEMICOLON\n");}
-#line 1297 "vgraph.tab.c"
-    break;
-
-  case 23: /* drawing: DRAW SHAPETHREE LPAR NUMBER COMMA NUMBER COMMA NUMBER RPAR SEMICOLON  */
-#line 73 "vgraph.y"
-         {printf("drawing -> DRAW SHAPE LPAR NUMBER COMMA NUMBER COMMA NUMBER RPAR SEMICOLON\n");}
-#line 1303 "vgraph.tab.c"
-    break;
-
-  case 24: /* drawing: DRAW SHAPETWO LPAR NUMBER COMMA NUMBER RPAR SEMICOLON  */
-#line 76 "vgraph.y"
-         {printf("drawing -> DRAW SHAPE LPAR NUMBER COMMA NUMBER RPAR SEMICOLON\n");}
-#line 1309 "vgraph.tab.c"
-    break;
-
-  case 25: /* drawing: DRAW SHAPETWO LPAR IDENT COMMA IDENT RPAR SEMICOLON  */
-#line 79 "vgraph.y"
-         {printf("drawing -> DRAW SHAPE LPAR IDENT COMMA IDENT RPAR SEMICOLON\n");}
-#line 1315 "vgraph.tab.c"
-    break;
-
-  case 26: /* setcolor: SETCOLOR LPAR COLORTYP RPAR SEMICOLON  */
+  case 18: /* assignment: IDENTIFIER '=' INTEGER  */
 #line 81 "vgraph.y"
-                                                {printf("setcolor -> SETCOLOR LPAR COLORTYP RPAR SEMICOLON\n");}
-#line 1321 "vgraph.tab.c"
+                                   {
+				updateSymbolVal((yyvsp[-2].id), (yyvsp[0].intT));
+				printf("new symbol = %d \n", (yyvsp[0].intT));
+		  }
+#line 1276 "vgraph.tab.c"
     break;
 
-  case 27: /* setcolor: SETCOLOR LPAR IDENT RPAR SEMICOLON  */
-#line 82 "vgraph.y"
-                                               {printf("setcolor -> SETCOLOR LPAR IDENT RPAR SEMICOLON\n");}
-#line 1327 "vgraph.tab.c"
+  case 19: /* assignment: var_declare  */
+#line 86 "vgraph.y"
+                              {;}
+#line 1282 "vgraph.tab.c"
     break;
 
-  case 28: /* wait: WAIT LPAR NUMBER RPAR SEMICOLON  */
-#line 84 "vgraph.y"
-                                      {printf("wait -> WAIT LPAR NUMBER RPAR SEMICOLON\n");}
-#line 1333 "vgraph.tab.c"
-    break;
-
-  case 29: /* declaration: LPAR INT RPAR IDENT EQUALS NUMBER SEMICOLON  */
+  case 20: /* assignment: error  */
 #line 87 "vgraph.y"
-             {printf("declaration -> LPAR INTEGER RPAR IDENT EQUALS NUMBER SEMICOLON\n");}
-#line 1339 "vgraph.tab.c"
+                          { fprintf(stderr, "Syntax error in assignment \n"); yyerror; }
+#line 1288 "vgraph.tab.c"
     break;
 
-  case 30: /* declaration: IDENT EQUALS NUMBER SEMICOLON  */
-#line 88 "vgraph.y"
-                                           {printf("declaration -> IDENT EQUALS NUMBER SEMICOLON \n");}
-#line 1345 "vgraph.tab.c"
+  case 21: /* var_declare: '(' INT ')' IDENTIFIER  */
+#line 90 "vgraph.y"
+                                    {printf("Declared as int succesfully \n");}
+#line 1294 "vgraph.tab.c"
     break;
 
-  case 31: /* declaration: IDENT EQUALS COLORTYP SEMICOLON  */
-#line 89 "vgraph.y"
-                                             {printf("declaration -> IDENT EQUALS COLORTYP SEMICOLON \n");}
-#line 1351 "vgraph.tab.c"
-    break;
-
-  case 32: /* declaration: LPAR COLOR RPAR IDENT EQUALS COLORTYP SEMICOLON  */
+  case 22: /* var_declare: '(' COLOR ')' IDENTIFIER  */
 #line 91 "vgraph.y"
-             {printf("declaration -> LPAR COLOR RPAR IDENT EQUALS ROJO SEMICOLON\n");}
-#line 1357 "vgraph.tab.c"
+                                               {printf("Declared color succesfully \n");}
+#line 1300 "vgraph.tab.c"
     break;
 
-  case 33: /* declaration: LPAR INT RPAR IDENT SEMICOLON  */
+  case 23: /* var_declare: error  */
 #line 92 "vgraph.y"
-                                           {printf("declaration -> LPAR INT RPAR IDENT SEMICOLON\n");}
-#line 1363 "vgraph.tab.c"
+                           { fprintf(stderr, "Syntax error in var_declare \n"); yyerror; }
+#line 1306 "vgraph.tab.c"
     break;
 
-  case 34: /* declaration: LPAR COLOR RPAR IDENT SEMICOLON  */
-#line 93 "vgraph.y"
-                                             {printf("declaration -> LPAR COLOR RPAR IDENT SEMICOLON\n");}
-#line 1369 "vgraph.tab.c"
+  case 24: /* wait: WAIT '(' INTEGER ')'  */
+#line 95 "vgraph.y"
+                           {printf("wait = \n");}
+#line 1312 "vgraph.tab.c"
+    break;
+
+  case 25: /* wait: error  */
+#line 96 "vgraph.y"
+                { fprintf(stderr, "Syntax error in wait \n"); yyerror; }
+#line 1318 "vgraph.tab.c"
+    break;
+
+  case 26: /* loop: LOOP '(' assignment ';' assignment ';' assignment ')' '{' body '}'  */
+#line 99 "vgraph.y"
+                                                                         {
+	printf("Executing loop \n");
+	}
+#line 1326 "vgraph.tab.c"
+    break;
+
+  case 27: /* loop: error  */
+#line 102 "vgraph.y"
+                { fprintf(stderr, "Syntax error in loop \n"); yyerror; }
+#line 1332 "vgraph.tab.c"
+    break;
+
+  case 28: /* set_color: SETCOLOR '(' IDENTIFIER ')'  */
+#line 105 "vgraph.y"
+                                       {printf("color set \n");}
+#line 1338 "vgraph.tab.c"
+    break;
+
+  case 29: /* draw_shape: DRAW PIXEL '(' float_r ',' float_r ')'  */
+#line 108 "vgraph.y"
+                                                   {
+	printf("shape drawn \n");
+	}
+#line 1346 "vgraph.tab.c"
+    break;
+
+  case 30: /* draw_shape: DRAW LINE '(' float_r ',' float_r ',' float_r ',' float_r ')'  */
+#line 111 "vgraph.y"
+                                                                                  {
+			printf("shape drawn \n");
+			}
+#line 1354 "vgraph.tab.c"
+    break;
+
+  case 31: /* draw_shape: DRAW RECT '(' float_r ',' float_r ',' float_r ',' float_r ')'  */
+#line 114 "vgraph.y"
+                                                                                  {
+			printf("shape drawn \n");
+			}
+#line 1362 "vgraph.tab.c"
+    break;
+
+  case 32: /* draw_shape: DRAW CIRCLE '(' float_r ',' float_r ',' float_r ')'  */
+#line 117 "vgraph.y"
+                                                                        {
+			printf("shape drawn \n");
+			}
+#line 1370 "vgraph.tab.c"
+    break;
+
+  case 33: /* draw_shape: error  */
+#line 120 "vgraph.y"
+                          { fprintf(stderr, "Syntax error in draw_shape \n"); yyerror; }
+#line 1376 "vgraph.tab.c"
+    break;
+
+  case 34: /* float_r: INTEGER  */
+#line 141 "vgraph.y"
+                 {;}
+#line 1382 "vgraph.tab.c"
+    break;
+
+  case 35: /* float_r: FLOAT  */
+#line 142 "vgraph.y"
+                   {;}
+#line 1388 "vgraph.tab.c"
     break;
 
 
-#line 1373 "vgraph.tab.c"
+#line 1392 "vgraph.tab.c"
 
       default: break;
     }
@@ -1562,13 +1581,42 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 94 "vgraph.y"
+#line 145 "vgraph.y"
 
 
-int main(void) {
-    yyparse();
+int computeSymbolIndex(char token)
+{
+	int idx = -1;
+	if(islower(token)) {
+		idx = token - 'a' + 26;
+	} else if(isupper(token)) {
+		idx = token - 'A';
+	}
+	return idx;
+} 
+
+/* returns the value of a given symbol */
+int symbolVal(char symbol)
+{
+	int bucket = computeSymbolIndex(symbol);
+	return symbols[bucket];
 }
 
-void yyerror(const char *s) {
-    printf("Error: %s\n", s);
+/* updates the value of a given symbol */
+void updateSymbolVal(char symbol, int val)
+{
+	int bucket = computeSymbolIndex(symbol);
+	symbols[bucket] = val;
 }
+
+int main (void) {
+	/* init symbol table */
+	int i;
+	for(i=0; i<52; i++) {
+		symbols[i] = 0;
+	}
+
+	return yyparse ( );
+}
+
+void yyerror (char *s) {fprintf (stderr, "%s\n", s);} 

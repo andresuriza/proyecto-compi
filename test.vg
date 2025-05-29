@@ -1,0 +1,8 @@
+# Definir variables para la espiral
+
+(int) x;
+(color) rojo;
+
+frame {
+    x = 3;
+}

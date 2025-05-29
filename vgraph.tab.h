@@ -39,7 +39,7 @@
 # define YY_YY_VGRAPH_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -54,40 +54,48 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    IDENT = 258,                   /* IDENT  */
-    NUMBER = 259,                  /* NUMBER  */
-    FUNC = 260,                    /* FUNC  */
-    LPAR = 261,                    /* LPAR  */
-    RPAR = 262,                    /* RPAR  */
-    LCURLY = 263,                  /* LCURLY  */
-    RCURLY = 264,                  /* RCURLY  */
-    INT = 265,                     /* INT  */
-    COLOR = 266,                   /* COLOR  */
-    COLORTYP = 267,                /* COLORTYP  */
-    COORD = 268,                   /* COORD  */
-    SEMICOLON = 269,               /* SEMICOLON  */
-    EQUALS = 270,                  /* EQUALS  */
-    SHAPEFOUR = 271,               /* SHAPEFOUR  */
-    SHAPETHREE = 272,              /* SHAPETHREE  */
-    SHAPETWO = 273,                /* SHAPETWO  */
-    DRAW = 274,                    /* DRAW  */
-    COMMA = 275,                   /* COMMA  */
-    SETCOLOR = 276,                /* SETCOLOR  */
-    WAIT = 277,                    /* WAIT  */
-    FRAME = 278,                   /* FRAME  */
-    LOOP = 279,                    /* LOOP  */
-    LT = 280,                      /* LT  */
-    GT = 281,                      /* GT  */
-    PLUS = 282,                    /* PLUS  */
-    IF = 283,                      /* IF  */
-    ELSE = 284                     /* ELSE  */
+    IDENTIFIER = 258,              /* IDENTIFIER  */
+    FUNC = 259,                    /* FUNC  */
+    INT = 260,                     /* INT  */
+    COLOR = 261,                   /* COLOR  */
+    COORD = 262,                   /* COORD  */
+    LINE = 263,                    /* LINE  */
+    RECT = 264,                    /* RECT  */
+    CIRCLE = 265,                  /* CIRCLE  */
+    PIXEL = 266,                   /* PIXEL  */
+    SETCOLOR = 267,                /* SETCOLOR  */
+    WAIT = 268,                    /* WAIT  */
+    FRAME = 269,                   /* FRAME  */
+    LOOP = 270,                    /* LOOP  */
+    LT = 271,                      /* LT  */
+    GT = 272,                      /* GT  */
+    PLUS = 273,                    /* PLUS  */
+    IF = 274,                      /* IF  */
+    ELSE = 275,                    /* ELSE  */
+    MODULUS = 276,                 /* MODULUS  */
+    DRAW = 277,                    /* DRAW  */
+    END = 278,                     /* END  */
+    MOVE = 279,                    /* MOVE  */
+    ANIMATE = 280,                 /* ANIMATE  */
+    COS = 281,                     /* COS  */
+    SIN = 282,                     /* SIN  */
+    INTEGER = 283,                 /* INTEGER  */
+    FLOAT = 284                    /* FLOAT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 16 "vgraph.y"
+int intT; float floatT; char* id;
+
+#line 96 "vgraph.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
