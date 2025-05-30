@@ -32,6 +32,15 @@ void vga_clear_screen();
 
 extern unsigned char g_320x200x256[];
 void write_regs(unsigned char *regs);
+void io_wait(void);
+void tree(int x, int y, double len, double ang, int depth);
+void animate_tree(int x, int y, double length, double angle, int max_depth);
+void draw_mandala_frame(int cx, int cy,int t);
+void animate_mandala(int cx, int cy);
+void wait_ticks(int ticks);
+void wait_ms(int ms);
+void animate_spiral(int cx, int cy, int radius_max);
+void draw_spiral_frame(int cx, int cy, int t_max);
 
 // end copied code
 
