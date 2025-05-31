@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_VGRAPH_TAB_H_INCLUDED
-# define YY_YY_VGRAPH_TAB_H_INCLUDED
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -54,45 +54,86 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    IDENTIFIER = 258,              /* IDENTIFIER  */
-    FUNC = 259,                    /* FUNC  */
-    INT = 260,                     /* INT  */
-    COLOR = 261,                   /* COLOR  */
-    COORD = 262,                   /* COORD  */
-    LINE = 263,                    /* LINE  */
-    RECT = 264,                    /* RECT  */
-    CIRCLE = 265,                  /* CIRCLE  */
-    PIXEL = 266,                   /* PIXEL  */
-    SETCOLOR = 267,                /* SETCOLOR  */
-    WAIT = 268,                    /* WAIT  */
-    FRAME = 269,                   /* FRAME  */
-    LOOP = 270,                    /* LOOP  */
-    LT = 271,                      /* LT  */
-    GT = 272,                      /* GT  */
-    PLUS = 273,                    /* PLUS  */
-    IF = 274,                      /* IF  */
-    ELSE = 275,                    /* ELSE  */
-    MODULUS = 276,                 /* MODULUS  */
-    DRAW = 277,                    /* DRAW  */
-    END = 278,                     /* END  */
-    MOVE = 279,                    /* MOVE  */
-    ANIMATE = 280,                 /* ANIMATE  */
-    COS = 281,                     /* COS  */
-    SIN = 282,                     /* SIN  */
-    INTEGER = 283,                 /* INTEGER  */
-    FLOAT = 284                    /* FLOAT  */
+    INTEGER = 258,                 /* INTEGER  */
+    VARIABLE = 259,                /* VARIABLE  */
+    IF = 260,                      /* IF  */
+    IFX = 261,                     /* IFX  */
+    ELSE = 262,                    /* ELSE  */
+    UMINUS = 263,                  /* UMINUS  */
+    FUNC = 264,                    /* FUNC  */
+    INT = 265,                     /* INT  */
+    COLOR = 266,                   /* COLOR  */
+    COORD = 267,                   /* COORD  */
+    LINE = 268,                    /* LINE  */
+    RECT = 269,                    /* RECT  */
+    CIRCLE = 270,                  /* CIRCLE  */
+    PIXEL = 271,                   /* PIXEL  */
+    SETCOLOR = 272,                /* SETCOLOR  */
+    WAIT = 273,                    /* WAIT  */
+    FRAME = 274,                   /* FRAME  */
+    LOOP = 275,                    /* LOOP  */
+    LT = 276,                      /* LT  */
+    GT = 277,                      /* GT  */
+    PLUS = 278,                    /* PLUS  */
+    MODULUS = 279,                 /* MODULUS  */
+    DRAW = 280,                    /* DRAW  */
+    END = 281,                     /* END  */
+    MOVE = 282,                    /* MOVE  */
+    ANIMATE = 283,                 /* ANIMATE  */
+    COS = 284,                     /* COS  */
+    SIN = 285,                     /* SIN  */
+    FLOAT = 286,                   /* FLOAT  */
+    PRINT = 287                    /* PRINT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
+#define INTEGER 258
+#define VARIABLE 259
+#define IF 260
+#define IFX 261
+#define ELSE 262
+#define UMINUS 263
+#define FUNC 264
+#define INT 265
+#define COLOR 266
+#define COORD 267
+#define LINE 268
+#define RECT 269
+#define CIRCLE 270
+#define PIXEL 271
+#define SETCOLOR 272
+#define WAIT 273
+#define FRAME 274
+#define LOOP 275
+#define LT 276
+#define GT 277
+#define PLUS 278
+#define MODULUS 279
+#define DRAW 280
+#define END 281
+#define MOVE 282
+#define ANIMATE 283
+#define COS 284
+#define SIN 285
+#define FLOAT 286
+#define PRINT 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "vgraph.y"
-int intT; float floatT; char* id;
+#line 22 "vgraph.y"
 
-#line 96 "vgraph.tab.h"
+    double dValue;                 /* integer value */
+    char sIndex;                /* symbol table index */
+    nodeType *nPtr;             /* node pointer */
+
+#line 137 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -107,4 +148,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_VGRAPH_TAB_H_INCLUDED  */
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

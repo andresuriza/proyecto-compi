@@ -1,8 +1,11 @@
 # Definir variables para la espiral
-
-(int) x;
-(color) rojo;
+x = sin(50);
 
 frame {
-    x = 3;
+    y = cos(50);
+    setcolor(y);
+    
+    draw pixel(x, y);
+    
+    wait(1); # Pequeño retraso para animación suave
 }

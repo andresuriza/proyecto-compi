@@ -1,7 +1,8 @@
 %{
-#include "vgraph.tab.h"
-void yyerror (char *s);
-int yylex();
+#include "ast.h"
+#include "y.tab.h"
+#include <stdlib.h>
+void yyerror (char *);
 %}
 
 %%
@@ -24,13 +25,17 @@ int yylex();
 "pixel" { return PIXEL; }
 "int" { return INT; }
 "color" { return COLOR; }
-[0-9]+ {yylval.intT = atoi(yytext); return INTEGER;}
-[0-9]+"."[0-9]+ {yylval.floatT = atoi(yytext); return FLOAT;}
-[a-z][a-zA-Z0-9]* {yylval.id = yytext[0]; return IDENTIFIER;}
-[-+*%/={};,()] {return yytext[0];}
+"print" { return PRINT; }
+[0-9]+ {yylval.dValue = atoi(yytext); return INTEGER;}
+[0-9]+"."[0-9]+ {return FLOAT;}
+[a-z][a-zA-Z0-9]* {yylval.sIndex = yylval.sIndex = *yytext - 'a'; return VARIABLE;}
+[-+*%/={};,()><] {return *yytext;}
 "#".* {} // Para comentarios
-[ \t\n] ;
+[ \t\n]+ ;
+.   yyerror("Unknown character");
 
 %%
 
-int yywrap (void) {return 1;}
+int yywrap(void) {
+    return 1;
+}

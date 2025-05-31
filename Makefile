@@ -1,11 +1,6 @@
-vgraph: lex.yy.c vgraph.tab.c
-	gcc -g lex.yy.c vgraph.tab.c -o vgraph
-
-lex.yy.c: y.tab.c vgraph.l
+all:
+	bison -y -d vgraph.y
 	flex vgraph.l
-
-y.tab.c: vgraph.y
-	bison -d vgraph.y
-
-clean: 
-	rm -rf lex.yy.c vgraph.tab.c vgraph.tab.h vgraph vgraph.dSYM
+	gcc -c y.tab.c lex.yy.c
+	gcc y.tab.o lex.yy.o ast.c -lm -o vgraph
+	gcc y.tab.o lex.yy.o ast.c -lm -o ast
