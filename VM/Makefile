@@ -13,6 +13,8 @@ include src/common/main.mk
 include src/kernel/main.mk
 include src/screen/main.mk
 include src/vga/main.mk
+include src/input/main.mk
+
 
 %.o: %.c
 	${CC} ${CCFLAGS} -c $< -o $@
@@ -24,6 +26,8 @@ ${ISO_OUT}: ${KERNEL_OUT}
 	mkdir -p build/iso/boot/grub
 	cp grub.cfg build/iso/boot/grub
 	cp $< build/iso/boot/grub
+	
+
 	grub-mkrescue -o $@ build/iso
 	rm -rf build
 

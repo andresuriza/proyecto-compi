@@ -3,6 +3,8 @@
 #include "../common/stdlib.h"
 #include "../screen/screen.h"
 #include "../vga/vga.h"
+#include "../input/interpreter.h"
+
 
 // ----- VGA initialization imports -----
 extern unsigned char g_320x200x256[];
@@ -216,6 +218,9 @@ void main() {
 	// 1) Inicializar VGA en modo 320x200x256
     write_regs(g_320x200x256);
     vga_clear_screen();
+
+    interpret_vgraph("ordenes.txt");  // <- leer desde archivo estático
+
 
     // 2) (Opcional) Ejecutar todas las órdenes de commands.txt
     //execute_commands_txt();
