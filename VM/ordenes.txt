@@ -1,4 +1,2 @@
-animate_tree
-animate_mandala
-animate_spiral
+animate_tree 80 80 40.0 90.0 2
 

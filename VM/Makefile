@@ -6,7 +6,7 @@ LINKER_SCRIPT=src/linker.ld
 KERNEL_OUT=pkos.bin
 ISO_OUT=pkos.iso
 
-OBJ_FILES := 
+OBJ_FILES := ordenes.o
 BIN_FILES := 
 
 include src/common/main.mk
@@ -15,6 +15,13 @@ include src/screen/main.mk
 include src/vga/main.mk
 include src/input/main.mk
 
+
+ordenes.o: ordenes.txt
+	objcopy \
+		--input-target=binary \
+		--output-target=elf32-i386 \
+		--binary-architecture=i386 \
+		ordenes.txt ordenes.o
 
 %.o: %.c
 	${CC} ${CCFLAGS} -c $< -o $@
