@@ -61,19 +61,19 @@ extern int yydebug;
     ELSE = 262,                    /* ELSE  */
     UMINUS = 263,                  /* UMINUS  */
     FUNC = 264,                    /* FUNC  */
-    INT = 265,                     /* INT  */
-    COLOR = 266,                   /* COLOR  */
-    COORD = 267,                   /* COORD  */
-    LINE = 268,                    /* LINE  */
-    RECT = 269,                    /* RECT  */
-    CIRCLE = 270,                  /* CIRCLE  */
-    PIXEL = 271,                   /* PIXEL  */
-    SETCOLOR = 272,                /* SETCOLOR  */
-    WAIT = 273,                    /* WAIT  */
-    FRAME = 274,                   /* FRAME  */
-    LOOP = 275,                    /* LOOP  */
-    LT = 276,                      /* LT  */
-    GT = 277,                      /* GT  */
+    COORD = 265,                   /* COORD  */
+    LINE = 266,                    /* LINE  */
+    RECT = 267,                    /* RECT  */
+    CIRCLE = 268,                  /* CIRCLE  */
+    PIXEL = 269,                   /* PIXEL  */
+    SETCOLOR = 270,                /* SETCOLOR  */
+    WAIT = 271,                    /* WAIT  */
+    FRAME = 272,                   /* FRAME  */
+    LOOP = 273,                    /* LOOP  */
+    LE = 274,                      /* LE  */
+    GE = 275,                      /* GE  */
+    NE = 276,                      /* NE  */
+    EQ = 277,                      /* EQ  */
     PLUS = 278,                    /* PLUS  */
     MODULUS = 279,                 /* MODULUS  */
     DRAW = 280,                    /* DRAW  */
@@ -82,8 +82,10 @@ extern int yydebug;
     ANIMATE = 283,                 /* ANIMATE  */
     COS = 284,                     /* COS  */
     SIN = 285,                     /* SIN  */
-    FLOAT = 286,                   /* FLOAT  */
-    PRINT = 287                    /* PRINT  */
+    PRINT = 286,                   /* PRINT  */
+    INT = 287,                     /* INT  */
+    FLOAT = 288,                   /* FLOAT  */
+    COLOR = 289                    /* COLOR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -99,19 +101,19 @@ extern int yydebug;
 #define ELSE 262
 #define UMINUS 263
 #define FUNC 264
-#define INT 265
-#define COLOR 266
-#define COORD 267
-#define LINE 268
-#define RECT 269
-#define CIRCLE 270
-#define PIXEL 271
-#define SETCOLOR 272
-#define WAIT 273
-#define FRAME 274
-#define LOOP 275
-#define LT 276
-#define GT 277
+#define COORD 265
+#define LINE 266
+#define RECT 267
+#define CIRCLE 268
+#define PIXEL 269
+#define SETCOLOR 270
+#define WAIT 271
+#define FRAME 272
+#define LOOP 273
+#define LE 274
+#define GE 275
+#define NE 276
+#define EQ 277
 #define PLUS 278
 #define MODULUS 279
 #define DRAW 280
@@ -120,20 +122,22 @@ extern int yydebug;
 #define ANIMATE 283
 #define COS 284
 #define SIN 285
-#define FLOAT 286
-#define PRINT 287
+#define PRINT 286
+#define INT 287
+#define FLOAT 288
+#define COLOR 289
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "vgraph.y"
+#line 23 "vgraph.y"
 
-    double dValue;                 /* integer value */
-    char sIndex;                /* symbol table index */
-    nodeType *nPtr;             /* node pointer */
+    double dValue;
+    int sIndex;      // index into symbolTable
+    nodeType* nPtr;
 
-#line 137 "y.tab.h"
+#line 141 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

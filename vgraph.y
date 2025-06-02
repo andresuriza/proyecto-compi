@@ -8,6 +8,7 @@
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(int i);
 nodeType *con(double value);
+
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
@@ -20,9 +21,9 @@ double sym[26];                    /* symbol table */
 // TODO rangos int, coords
 
 %union {
-    double dValue;                 /* integer value */
-    char sIndex;                /* symbol table index */
-    nodeType *nPtr;             /* node pointer */
+    double dValue;
+    int sIndex;      // index into symbolTable
+    nodeType* nPtr;
 };
 
 %token <dValue> INTEGER
@@ -33,12 +34,10 @@ double sym[26];                    /* symbol table */
 
 %left '>' '<'
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %nonassoc UMINUS
 
 %token FUNC
-%token INT
-%token COLOR
 %token COORD
 %token LINE
 %token RECT
@@ -48,8 +47,10 @@ double sym[26];                    /* symbol table */
 %token WAIT
 %token FRAME
 %token LOOP
-%token LT
-%token GT
+%token LE
+%token GE
+%token NE
+%token EQ
 %token PLUS
 %token MODULUS
 %token DRAW
@@ -58,10 +59,10 @@ double sym[26];                    /* symbol table */
 %token ANIMATE
 %token COS
 %token SIN
-%token FLOAT
 %token PRINT
+%token INT FLOAT COLOR
 
-%type <nPtr> stmt expr stmt_list frame
+%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment declaration
 
 %%
 
@@ -81,18 +82,33 @@ frame:
 
 stmt:
           ';'   { $$ = opr(';', 2, NULL, NULL); }
+        | declaration ';' { $$ = $1; }
         | expr ';'  { $$ = $1; }
-        //| PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | VARIABLE '=' expr ';' { $$ = opr('=', 2, id($1), $3); }
-        //| WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
-        | IF '(' expr ')' stmt %prec IFX    { $$ = opr(IF, 2, $3, $5); }
-        | IF '(' expr ')' stmt ELSE stmt    { $$ = opr(IF, 3, $3, $5, $7); }
+        | assignment ';'  { $$ = $1; }
+        | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { 
+                $$ = opr(LOOP, 4, $3, $5, $7, $9); 
+            }
+        | IF '(' conditional ')' conditional_body %prec IFX    { $$ = opr(IF, 2, $3, $5); }
+        | IF '(' conditional ')' conditional_body ELSE conditional_body  { $$ = opr(IF, 3, $3, $5, $7); }
         | SETCOLOR '(' expr ')' ';'  { $$ = opr(SETCOLOR, 1, $3); }
         | WAIT '(' expr ')' ';'  { $$ = opr(WAIT, 1, $3); }
         | DRAW PIXEL '(' expr ',' expr ')' ';'  { $$ = opr(PIXEL, 2, $4, $6); }
-        | '{' stmt_list '}' { $$ = $2; }
+        //| '{' stmt_list '}' { $$ = $2; }
         ;
 
+declaration:
+      '(' INT ')' VARIABLE     { $$ = opr('=', 2, id($4), 0);  }
+    | '(' COLOR ')' VARIABLE   { $$ = opr('=', 2, id($4), 0);  }
+;
+
+assignment:
+           VARIABLE '=' expr { $$ = opr('=', 2, id($1), $3); }
+          ;
+
+conditional_body:
+          '{' stmt_list '}' { $$ = $2; }
+          | stmt_list { $$ = $1; }
+        ;
 
 stmt_list:
           stmt                  { $$ = $1; }
@@ -107,16 +123,24 @@ expr:
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
         | expr '*' expr         { $$ = opr('*', 2, $1, $3); }
         | expr '/' expr         { $$ = opr('/', 2, $1, $3); }
-        | expr '<' expr         { $$ = opr('<', 2, $1, $3); }
-        | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
+        | expr '%' expr         { $$ = opr('%', 2, $1, $3); }
         | COS '(' expr ')'      { $$ = opr(COS, 1, $3); }
         | SIN '(' expr ')'      { $$ = opr(SIN, 1, $3); }
-        //| expr GE expr          { $$ = opr(GE, 2, $1, $3); }
-        //| expr LE expr          { $$ = opr(LE, 2, $1, $3); }
-        //| expr NE expr          { $$ = opr(NE, 2, $1, $3); }
-        //| expr EQ expr          { $$ = opr(EQ, 2, $1, $3); }
         | '(' expr ')'          { $$ = $2; }
         ;
+
+conditional:
+           expr '<' expr         { $$ = opr('<', 2, $1, $3); }
+         | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
+         | expr '>''=' expr         { $$ = opr(GE, 2, $1, $4); }
+         | expr '<''=' expr         { $$ = opr(LE, 2, $1, $4); }
+         | expr '=''=' expr         { $$ = opr(EQ, 2, $1, $4); }
+         | expr '!''=' expr         { $$ = opr(NE, 2, $1, $4); }
+         ;
+
+condition:
+           '(' assignment ';' conditional ';'  assignment ')' { $$ = $4; }
+         ;
 
 %%
 
@@ -187,79 +211,3 @@ int main(void) {
     yyparse();
     return 0;
 }
-
-/**
-exp: term {$$ = $1;}
-	| exp '+' term {$$ = $1 + $3;}
-	| exp '-' term {$$ = $1 - $3;}
-	| exp '*' term {$$ = $1 * $3;}
-	| exp '/' term {$$ = $1 / $3;}
-	| COS '(' exp ')' {$$ = cos($3);}
-	| SIN '(' exp ')'{$$ = sin($3);}
-	| exp '%' term {$$ = (int)$1 % (int)$3;}
-	| error { fprintf(stderr, "Syntax error in exp \n"); yyerror; }
-	;
-
-term: INTEGER {$$ = $1;}
-		| IDENTIFIER {$$ = symbolVal($1);} 
-		| error { fprintf(stderr, "Syntax error in term \n"); yyerror; }
-        ;
-
-float_r: INTEGER {;}
-	   | FLOAT {;}
-	   ;
-
-if: IF '(' condition ')' {printf("if something \n");}
-  ;
-
-else: {{printf("else something \n");};}
-    ;
-
-condition: {;}
-		 ;
-
-%%
-
-int computeSymbolIndex(char token)
-{
-	int idx = -1;
-	if(islower(token)) {
-		idx = token - 'a' + 26;
-	} else if(isupper(token)) {
-		idx = token - 'A';
-	}
-	return idx;
-} 
-*/
-
-/* returns the value of a given symbol
-int symbolVal(char symbol)
-{
-	int bucket = computeSymbolIndex(symbol);
-	return symbols[bucket];
-}
-
-/* updates the value of a given symbol
-void updateSymbolVal(char symbol, int val)
-{
-	int bucket = computeSymbolIndex(symbol);
-	symbols[bucket] = val;
-}
-
-void yyerror (char *s) {
-	fprintf (stderr, "Parse error:%s\n", s);
-	exit(1);
-} 
-
-int main (void) {
-	/* init symbol table
-	int i;
-	for(i=0; i<52; i++) {
-		symbols[i] = 0;
-	}
-	
-	yydebug = 0;
-
-	yyparse();
-}
-*/

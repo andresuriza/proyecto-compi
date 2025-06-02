@@ -23,13 +23,16 @@ void yyerror (char *);
 "cos" { return COS; }
 "sin" { return SIN; }
 "pixel" { return PIXEL; }
-"int" { return INT; }
-"color" { return COLOR; }
 "print" { return PRINT; }
+
+"int"       { return INT; }
+"float"     { return FLOAT; }
+"color"     { return COLOR; }
+
+[0-9]+\.[0-9]+ {yylval.dValue = atof(yytext); return INTEGER;}
 [0-9]+ {yylval.dValue = atoi(yytext); return INTEGER;}
-[0-9]+"."[0-9]+ {return FLOAT;}
 [a-z][a-zA-Z0-9]* {yylval.sIndex = yylval.sIndex = *yytext - 'a'; return VARIABLE;}
-[-+*%/={};,()><] {return *yytext;}
+[-+*%/!={};,()><] {return *yytext;}
 "#".* {} // Para comentarios
 [ \t\n]+ ;
 .   yyerror("Unknown character");
