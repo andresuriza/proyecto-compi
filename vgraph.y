@@ -54,6 +54,7 @@ double sym[26];                    /* symbol table */
 %token PLUS
 %token MODULUS
 %token DRAW
+%token TREE
 %token END
 %token MOVE
 %token ANIMATE
@@ -62,12 +63,12 @@ double sym[26];                    /* symbol table */
 %token PRINT
 %token INT FLOAT COLOR
 
-%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment declaration
+%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment
 
 %%
 
 program:
-        function    { exit(0); }
+        function { exit(0); }
         ;
 
 function:
@@ -80,9 +81,10 @@ frame:
           FRAME '{' stmt_list '}' { $$ = $3; }
         ;
 
+
 stmt:
           ';'   { $$ = opr(';', 2, NULL, NULL); }
-        | declaration ';' { $$ = $1; }
+        //| var_type ';' { $$ = $1; }
         | expr ';'  { $$ = $1; }
         | assignment ';'  { $$ = $1; }
         | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { 
@@ -93,13 +95,18 @@ stmt:
         | SETCOLOR '(' expr ')' ';'  { $$ = opr(SETCOLOR, 1, $3); }
         | WAIT '(' expr ')' ';'  { $$ = opr(WAIT, 1, $3); }
         | DRAW PIXEL '(' expr ',' expr ')' ';'  { $$ = opr(PIXEL, 2, $4, $6); }
+        | DRAW TREE '(' expr ',' expr ',' expr ',' expr ',' expr ')' ';'  { 
+                $$ = opr(TREE, 2, $4, $6, $8, $10, $12); 
+            }
         //| '{' stmt_list '}' { $$ = $2; }
         ;
 
-declaration:
-      '(' INT ')' VARIABLE     { $$ = opr('=', 2, id($4), 0);  }
-    | '(' COLOR ')' VARIABLE   { $$ = opr('=', 2, id($4), 0);  }
-;
+/*
+var_type:
+          '(' INT ')' VARIABLE { $$ = opr('=', 2, id($4), 0); }
+          '(' COLOR ')' VARIABLE { $$ = opr('=', 2, id($4), 0); }
+        ;
+*/
 
 assignment:
            VARIABLE '=' expr { $$ = opr('=', 2, id($1), $3); }

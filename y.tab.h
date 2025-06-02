@@ -77,15 +77,16 @@ extern int yydebug;
     PLUS = 278,                    /* PLUS  */
     MODULUS = 279,                 /* MODULUS  */
     DRAW = 280,                    /* DRAW  */
-    END = 281,                     /* END  */
-    MOVE = 282,                    /* MOVE  */
-    ANIMATE = 283,                 /* ANIMATE  */
-    COS = 284,                     /* COS  */
-    SIN = 285,                     /* SIN  */
-    PRINT = 286,                   /* PRINT  */
-    INT = 287,                     /* INT  */
-    FLOAT = 288,                   /* FLOAT  */
-    COLOR = 289                    /* COLOR  */
+    TREE = 281,                    /* TREE  */
+    END = 282,                     /* END  */
+    MOVE = 283,                    /* MOVE  */
+    ANIMATE = 284,                 /* ANIMATE  */
+    COS = 285,                     /* COS  */
+    SIN = 286,                     /* SIN  */
+    PRINT = 287,                   /* PRINT  */
+    INT = 288,                     /* INT  */
+    FLOAT = 289,                   /* FLOAT  */
+    COLOR = 290                    /* COLOR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -117,15 +118,16 @@ extern int yydebug;
 #define PLUS 278
 #define MODULUS 279
 #define DRAW 280
-#define END 281
-#define MOVE 282
-#define ANIMATE 283
-#define COS 284
-#define SIN 285
-#define PRINT 286
-#define INT 287
-#define FLOAT 288
-#define COLOR 289
+#define TREE 281
+#define END 282
+#define MOVE 283
+#define ANIMATE 284
+#define COS 285
+#define SIN 286
+#define PRINT 287
+#define INT 288
+#define FLOAT 289
+#define COLOR 290
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -137,7 +139,7 @@ union YYSTYPE
     int sIndex;      // index into symbolTable
     nodeType* nPtr;
 
-#line 141 "y.tab.h"
+#line 143 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

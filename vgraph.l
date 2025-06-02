@@ -18,13 +18,13 @@ void yyerror (char *);
 "line" { return LINE; }
 "circle" { return CIRCLE; }
 "rect" { return RECT; }
+"tree" { return TREE; }
 "move" { return MOVE; }
 "animate" { return ANIMATE; }
 "cos" { return COS; }
 "sin" { return SIN; }
 "pixel" { return PIXEL; }
 "print" { return PRINT; }
-
 "int"       { return INT; }
 "float"     { return FLOAT; }
 "color"     { return COLOR; }

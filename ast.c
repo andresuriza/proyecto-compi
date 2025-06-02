@@ -24,6 +24,15 @@ double ex(nodeType *p) {
         case PIXEL: 
                     printf("drawing at: (%f, %f) \n", ex(p->opr.op[0]), ex(p->opr.op[1])); 
                     return 0;
+        case TREE: {
+                    printf(
+                        "#include \"../vga/vga.h\" \n"
+                        "void interpret_vgraph() { \n"
+                        "    animate_tree(160, 190, 40.0, -90.0, 6); \n"
+                        "}; \n"
+                    );
+                    return 0;
+                }
         //case PRINT:     printf("%d\n", ex(p->opr.op[0])); return 0;
         case ';':       ex(p->opr.op[0]); return ex(p->opr.op[1]);
         case '=':   
