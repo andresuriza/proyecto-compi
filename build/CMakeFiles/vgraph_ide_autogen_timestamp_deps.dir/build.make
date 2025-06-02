@@ -66,8 +66,8 @@ include CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/progress.make
 
-CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
 CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13
+CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
 CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/moc
 
 vgraph_ide_autogen_timestamp_deps: CMakeFiles/vgraph_ide_autogen_timestamp_deps

@@ -375,4 +375,17 @@ CMakeFiles/vgraph_ide.dir/main.cpp.o: \
  /usr/include/qtermwidget5/qtermwidget_interface.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QFont \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextCursor \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextcursor.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextBlock \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextobject.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextlayout.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qglyphrun.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qrawfont.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontdatabase.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextCharFormat \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextformat.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QRegularExpression \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qregularexpression.h \
  /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/include/main.moc

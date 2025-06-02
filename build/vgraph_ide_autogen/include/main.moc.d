@@ -279,6 +279,7 @@
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QMetaType \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QRegExp \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QRegularExpression \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QStringList \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QTextCodec \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QTextStream \
@@ -334,6 +335,7 @@
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qregexp.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qregularexpression.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h \
@@ -362,13 +364,18 @@
   /usr/include/x86_64-linux-gnu/qt5/QtGui/QFont \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeySequence \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextBlock \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextCharFormat \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/QTextCursor \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontdatabase.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontinfo.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontmetrics.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qglyphrun.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qicon.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
@@ -381,12 +388,15 @@
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixelformat.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixmap.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpolygon.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qrawfont.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qregion.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qrgb.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qrgba64.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextcursor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextdocument.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextformat.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextlayout.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextobject.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextoption.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtgui-config.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtguiglobal.h \
