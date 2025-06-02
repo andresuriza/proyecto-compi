@@ -3,6 +3,21 @@
 #include "../common/stdlib.h"
 #include "../screen/screen.h"
 #include "../vga/vga.h"
+#include "../input/interpreter.h"
+
+
+// ----- VGA initialization imports -----
+extern unsigned char g_320x200x256[];
+extern void write_regs(unsigned char *regs);
+extern void vga_clear_screen(void);
+
+
+
+// Códigos de escaneo para tus comandos
+#define SCAN_T 20   // 't'
+#define SCAN_S 31   // 's'
+#define SCAN_M 50   // 'm'
+
 
 // ----- Global variables -----
 struct IDT_entry IDT[IDT_SIZE]; // This is our entire IDT. Room for 256 interrupts
@@ -144,7 +159,7 @@ void handle_keyboard_interrupt() {
 				clear_screen();
 				cursor_row = 0;
 			} else if (streq(command_buffer, command_len, "vga", 3)) {
-				vga_test();
+				main();
 			} else if (streq(command_buffer, command_len, "help", 4)) {
 				println("ls: List files", 14);
 				println("clear: Clear screen", 19);
@@ -197,14 +212,32 @@ void print_message() {
 	cursor_row = 4;
 }
 
+
 // ----- Entry point -----
 void main() {
-	print_message();
-	print_prompt();
-	disable_cursor();
-	init_idt();
-	kb_init();
-	enable_interrupts();
-	// Finish main execution, but don't halt the CPU. Same as `jmp $` in assembly
-	while(1);
+	// 1) Inicializar VGA en modo 320x200x256
+    write_regs(g_320x200x256);
+    vga_clear_screen();
+
+    interpret_vgraph("ordenes.txt");  // <- leer desde archivo estático
+
+
+    // 2) (Opcional) Ejecutar todas las órdenes de commands.txt
+    //execute_commands_txt();
+
+    // 3) Desactivar cursor de texto
+    disable_cursor();
+
+    // 4) Configurar IDT y teclado
+    init_idt();
+    kb_init();
+    enable_interrupts();
+
+    // 5) Bucle principal de despacho por teclado en modo VGA
+    //vga_command_loop();
+
+    // Nunca llega aquí
+    while (1) {
+        __asm__ volatile("hlt");
+    }
 }

@@ -4,6 +4,8 @@
 #include <math.h>
 
 double ex(nodeType *p) {
+    FILE *f = fopen("VM/src/input/interpreter.c", "w");
+
     if (!p) return 0;
     switch(p->type) {
     case typeCon:       return p->con.value;
@@ -25,14 +27,17 @@ double ex(nodeType *p) {
                     printf("drawing at: (%f, %f) \n", ex(p->opr.op[0]), ex(p->opr.op[1])); 
                     return 0;
         case TREE: {
-                    printf(
+                    fprintf(f,
                         "#include \"../vga/vga.h\" \n"
                         "void interpret_vgraph() { \n"
                         "    animate_tree(160, 190, 40.0, -90.0, 6); \n"
+                        "    animate_mandala(160, 100); \n"
+                        "    animate_spiral(160, 100, 100); \n"
                         "}; \n"
                     );
                     return 0;
                 }
+
         //case PRINT:     printf("%d\n", ex(p->opr.op[0])); return 0;
         case ';':       ex(p->opr.op[0]); return ex(p->opr.op[1]);
         case '=':   

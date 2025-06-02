@@ -215,6 +215,10 @@ void yyerror(char *s) {
 }
 
 int main(void) {
+    FILE* fptr;
+    fptr = fopen("file.txt", "w");
+    
     yyparse();
+
     return 0;
 }
