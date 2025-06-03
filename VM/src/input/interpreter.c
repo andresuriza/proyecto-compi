@@ -4,8 +4,8 @@
 #include "../vga/vga_color.h"  
 #include "../common/stdlib.h" // Para atoi(), atof(), strcmp(), strlen()
 
-extern const unsigned char _binary_ordenes_txt_start[];
-extern const unsigned char _binary_ordenes_txt_end[];
+extern const unsigned char _binary_ordenes_vg_start[];
+extern const unsigned char _binary_ordenes_vg_end[];
 
 
 // -----------------------------------------------------------------------------
@@ -221,8 +221,8 @@ static void ejecutar_una_linea(const char *line) {
 // _binary_ordenes_txt_end, agrupa en líneas (sin '\n') y llama a ejecutar_una_linea.
 // -----------------------------------------------------------------------------
 void interpret_vgraph(const char *unused_path) {
-    const unsigned char *p = _binary_ordenes_txt_start;
-    const unsigned char *end = _binary_ordenes_txt_end;
+    const unsigned char *p = _binary_ordenes_vg_start;
+    const unsigned char *end = _binary_ordenes_vg_end;
     const unsigned char *line_start = p;
 
     while (p < end) {
