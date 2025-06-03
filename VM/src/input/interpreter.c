@@ -4,8 +4,8 @@
 #include "../vga/vga_color.h"  
 #include "../common/stdlib.h" // Para atoi(), atof(), strcmp(), strlen()
 
-extern const unsigned char _binary_ordenes_txt_start[];
-extern const unsigned char _binary_ordenes_txt_end[];
+extern const unsigned char _binary_ordenes_vg_start[];
+extern const unsigned char _binary_ordenes_vg_end[];
 
 
 // -----------------------------------------------------------------------------
@@ -21,27 +21,52 @@ static int parsear_tokens(char *buffer, char *args[], int max) {
     char *p = buffer;
 
     while (*p != '\0' && argc < max) {
-        // 1) Saltar cualquier espacio o tab
+        // Saltar espacios y tabs
         while (*p == ' ' || *p == '\t') {
             p++;
         }
-        if (*p == '\0') break;
+        if (*p == '\0' || *p == ';') break;
 
-        // 2) Este es el inicio de un token
+        // Marcar el inicio del token
         args[argc++] = p;
 
-        // 3) Avanzar hasta encontrar espacio/tab o fin de cadena
-        while (*p != '\0' && *p != ' ' && *p != '\t') {
-            p++;
-        }
-        // 4) Si no es final de línea, reemplazar separador por '\0' y avanzar
-        if (*p == ' ' || *p == '\t') {
-            *p = '\0';
-            p++;
+        // Si empieza con paréntesis, procesar hasta cierre
+        if (*p == '(') {
+            p++; // saltar el '('
+            args[argc - 1] = p; // argumento real empieza después de '('
+
+            while (*p != ')' && *p != '\0' && argc < max) {
+                if (*p == ',') {
+                    *p = '\0'; // separar el argumento
+                    p++;
+                    while (*p == ' ' || *p == '\t') p++; // saltar espacios
+                    if (*p != ')' && *p != '\0') {
+                        args[argc++] = p;
+                    }
+                } else {
+                    p++;
+                }
+            }
+
+            if (*p == ')') {
+                *p = '\0'; // terminar el último argumento
+                p++; // avanzar después del ')'
+            }
+        } else {
+            // Avanzar hasta el próximo separador
+            while (*p != '\0' && *p != ' ' && *p != '\t' && *p != ';') {
+                p++;
+            }
+            if (*p == ' ' || *p == '\t' || *p == ';') {
+                *p = '\0';
+                p++;
+            }
         }
     }
+
     return argc;
 }
+
 
 // -----------------------------------------------------------------------------
 // ejecutar_una_linea(): recibe una línea (sin '\n'), la divide en tokens y
@@ -221,8 +246,8 @@ static void ejecutar_una_linea(const char *line) {
 // _binary_ordenes_txt_end, agrupa en líneas (sin '\n') y llama a ejecutar_una_linea.
 // -----------------------------------------------------------------------------
 void interpret_vgraph(const char *unused_path) {
-    const unsigned char *p = _binary_ordenes_txt_start;
-    const unsigned char *end = _binary_ordenes_txt_end;
+    const unsigned char *p = _binary_ordenes_vg_start;
+    const unsigned char *end = _binary_ordenes_vg_end;
     const unsigned char *line_start = p;
 
     while (p < end) {
