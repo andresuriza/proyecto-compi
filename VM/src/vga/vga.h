@@ -41,6 +41,7 @@ void wait_ticks(int ticks);
 void wait_ms(int ms);
 void animate_spiral(int cx, int cy, int radius_max);
 void draw_spiral_frame(int cx, int cy, int t_max);
+void wait(int s);
 
 // end copied code
 

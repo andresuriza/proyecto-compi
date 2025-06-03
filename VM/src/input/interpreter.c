@@ -82,7 +82,7 @@ static void ejecutar_una_linea(const char *line) {
             int depth  = atoi(args[5]);
             animate_tree(x, y, len, ang, depth);
         } else {
-            print("Error: animate_tree requiere 5 parámetros\n", 37);
+            println("Error: animate_tree requiere 5 parámetros\n", 37);
         }
         return;
     }
@@ -97,7 +97,7 @@ static void ejecutar_una_linea(const char *line) {
             int cy     = atoi(args[2]);
             animate_mandala(cx, cy);
         } else {
-            print("Error: animate_mandala requiere 2 parámetros\n", 40);
+            println("Error: animate_mandala requiere 2 parámetros\n", 40);
         }
         return;
     }
@@ -113,7 +113,7 @@ static void ejecutar_una_linea(const char *line) {
             int r          = atoi(args[3]);
             animate_spiral(cx, cy, r);
         } else {
-            print("Error: animate_spiral requiere 3 parámetros\n", 40);
+            println("Error: animate_spiral requiere 3 parámetros\n", 40);
         }
         return;
     }
@@ -123,7 +123,7 @@ static void ejecutar_una_linea(const char *line) {
             int y            = atoi(args[2]);
             draw_pixel(x,y);
         } else {
-            print("Error: draw_pixel requiere 2 parámetros\n", 40);
+            println("Error: draw_pixel requiere 2 parámetros\n", 40);
         }
         return;
     }
@@ -147,13 +147,13 @@ static void ejecutar_una_linea(const char *line) {
         else if (strcmp(args[1], "yellow") == 0)      col = COLOR_YELLOW;
         else if (strcmp(args[1], "white") == 0)       col = COLOR_WHITE;
         else {
-            print("Error: color desconocido\n", 24);
+            println("Error: color desconocido\n", 24);
             return;
         }
 
         set_color(col);
     } else {
-        print("Error: set_color requiere 1 parámetro\n", 38);
+        println("Error: set_color requiere 1 parámetro\n", 38);
     }
     return;
     }
@@ -165,7 +165,7 @@ static void ejecutar_una_linea(const char *line) {
             int y1            = atoi(args[4]);
             draw_line(x0,y0,x1,y1);
         } else {
-            print("Error: draw_line requiere 4 parámetros\n", 40);
+            println("Error: draw_line requiere 4 parámetros\n", 40);
         }
         return;
     }
@@ -177,7 +177,7 @@ static void ejecutar_una_linea(const char *line) {
             int height            = atoi(args[4]);
             draw_rect(x,y,width,height);
         } else {
-            print("Error: draw_rect requiere 4 parámetros\n", 40);
+            println("Error: draw_rect requiere 4 parámetros\n", 40);
         }
         return;
     }
@@ -188,7 +188,16 @@ static void ejecutar_una_linea(const char *line) {
             int r           = atoi(args[3]);
             draw_circle(xc,yc,r);
         } else {
-            print("Error: draw_circle requiere 3 parámetros\n", 40);
+            println("Error: draw_circle requiere 3 parámetros\n", 40);
+        }
+        return;
+    }
+    if (strcmp(cmd, "wait") == 0) {
+        if (argc == 2) {
+            int s           = atoi(args[1]);
+            wait(s);
+        } else {
+            println("Error: wait requiere 1 parámetros\n", 40);
         }
         return;
     }
