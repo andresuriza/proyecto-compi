@@ -1,2 +1,2 @@
-animate_tree 80 80 40.0 90.0 2
-
+animate_tree 180 180 40.0 90.0 6
+animate_spiral 180 180 180

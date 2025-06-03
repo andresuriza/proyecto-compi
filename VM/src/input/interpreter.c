@@ -1,6 +1,7 @@
 // File: src/input/interpreter.c
 
-#include "../vga/vga.h"       // Aquí debe estar declarado: void print(const char*, int);
+#include "../vga/vga.h"    
+#include "../vga/vga_color.h"  
 #include "../common/stdlib.h" // Para atoi(), atof(), strcmp(), strlen()
 
 extern const unsigned char _binary_ordenes_txt_start[];
@@ -88,10 +89,10 @@ static void ejecutar_una_linea(const char *line) {
 
     // ================================================================
     // 2) Comando: animate_mandala cx cy radius petals
-    //    Debe venir argc == 5 (1 comando + 4 parámetros)
+    //    Debe venir argc == 3 (1 comando + 2 parámetros)
     // ================================================================
     if (strcmp(cmd, "animate_mandala") == 0) {
-        if (argc == 5) {
+        if (argc == 3) {
             int cx     = atoi(args[1]);
             int cy     = atoi(args[2]);
             animate_mandala(cx, cy);
@@ -103,16 +104,91 @@ static void ejecutar_una_linea(const char *line) {
 
     // ================================================================
     // 3) Comando: animate_spiral cx cy radius angle_increment
-    //    Debe venir argc == 5 (1 comando + 4 parámetros)
+    //    Debe venir argc == 4 (1 comando + 3 parámetros)
     // ================================================================
     if (strcmp(cmd, "animate_spiral") == 0) {
-        if (argc == 5) {
+        if (argc == 4) {
             int cx            = atoi(args[1]);
             int cy            = atoi(args[2]);
-            int r          = atof(args[3]);
-            animate_spiral(cx, cy, 3);
+            int r          = atoi(args[3]);
+            animate_spiral(cx, cy, r);
         } else {
             print("Error: animate_spiral requiere 3 parámetros\n", 40);
+        }
+        return;
+    }
+    if (strcmp(cmd, "draw_pixel") == 0) {
+        if (argc == 3) {
+            int x            = atoi(args[1]);
+            int y            = atoi(args[2]);
+            draw_pixel(x,y);
+        } else {
+            print("Error: draw_pixel requiere 2 parámetros\n", 40);
+        }
+        return;
+    }
+    if (strcmp(cmd, "set_color") == 0) {
+      if (argc == 2) {
+        unsigned char col;
+        if (strcmp(args[1], "black") == 0)          col = COLOR_BLACK;
+        else if (strcmp(args[1], "blue") == 0)      col = COLOR_BLUE;
+        else if (strcmp(args[1], "green") == 0)     col = COLOR_GREEN;
+        else if (strcmp(args[1], "cyan") == 0)      col = COLOR_CYAN;
+        else if (strcmp(args[1], "red") == 0)       col = COLOR_RED;
+        else if (strcmp(args[1], "magenta") == 0)   col = COLOR_MAGENTA;
+        else if (strcmp(args[1], "brown") == 0)     col = COLOR_BROWN;
+        else if (strcmp(args[1], "light_gray") == 0)  col = COLOR_LIGHT_GRAY;
+        else if (strcmp(args[1], "dark_gray") == 0)   col = COLOR_DARK_GRAY;
+        else if (strcmp(args[1], "light_blue") == 0)  col = COLOR_LIGHT_BLUE;
+        else if (strcmp(args[1], "light_green") == 0) col = COLOR_LIGHT_GREEN;
+        else if (strcmp(args[1], "light_cyan") == 0)  col = COLOR_LIGHT_CYAN;
+        else if (strcmp(args[1], "light_red") == 0)   col = COLOR_LIGHT_RED;
+        else if (strcmp(args[1], "light_magenta") == 0) col = COLOR_LIGHT_MAGENTA;
+        else if (strcmp(args[1], "yellow") == 0)      col = COLOR_YELLOW;
+        else if (strcmp(args[1], "white") == 0)       col = COLOR_WHITE;
+        else {
+            print("Error: color desconocido\n", 24);
+            return;
+        }
+
+        set_color(col);
+    } else {
+        print("Error: set_color requiere 1 parámetro\n", 38);
+    }
+    return;
+    }
+    if (strcmp(cmd, "draw_line") == 0) {
+        if (argc == 5) {
+            int x0            = atoi(args[1]);
+            int y0            = atoi(args[2]);
+            int x1            = atoi(args[3]);
+            int y1            = atoi(args[4]);
+            draw_line(x0,y0,x1,y1);
+        } else {
+            print("Error: draw_line requiere 4 parámetros\n", 40);
+        }
+        return;
+    }
+    if (strcmp(cmd, "draw_rect") == 0) {
+        if (argc == 5) {
+            int x            = atoi(args[1]);
+            int y            = atoi(args[2]);
+            int width           = atoi(args[3]);
+            int height            = atoi(args[4]);
+            draw_rect(x,y,width,height);
+        } else {
+            print("Error: draw_rect requiere 4 parámetros\n", 40);
+        }
+        return;
+    }
+    if (strcmp(cmd, "draw_circle") == 0) {
+        if (argc == 4) {
+            int xc           = atoi(args[1]);
+            int yc            = atoi(args[2]);
+            int r           = atoi(args[3]);
+            draw_circle(xc,yc,r);
+        } else {
+            print("Error: draw_circle requiere 3 parámetros\n", 40);
         }
         return;
     }

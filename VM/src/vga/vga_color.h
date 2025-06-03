@@ -25,9 +25,9 @@
 
 // Prototipos de funciones…
 void set_color(unsigned char col);
-void vga_plot_pixel(int x, int y);
+void draw_pixel(int x, int y);
 void vga_clear_screen();
-void vga_draw_line(int x0, int y0, int x1, int y1);
+void draw_line(int x0, int y0, int x1, int y1);
 void draw_rect(int x, int y, int width, int height);
 void draw_circle(int xc, int yc, int r);
 

@@ -222,9 +222,6 @@ void main() {
     interpret_vgraph("ordenes.txt");  // <- leer desde archivo estático
 
 
-    // 2) (Opcional) Ejecutar todas las órdenes de commands.txt
-    //execute_commands_txt();
-
     // 3) Desactivar cursor de texto
     disable_cursor();
 

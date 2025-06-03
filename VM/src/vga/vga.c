@@ -111,7 +111,7 @@ void tree(int x1, int y1, double length, double angle, int depth) {
     int y2 = y1 - (int)(length * sin_approx(rad));
     unsigned char col = color_by_depth(depth);
     set_color(color_by_depth(depth));
-    vga_draw_line(x1, y1, x2, y2);
+    draw_line(x1, y1, x2, y2);
     tree(x2, y2, length * 0.7, angle - 25.0, depth - 1);
     tree(x2, y2, length * 0.7, angle + 25.0, depth - 1);
 }
@@ -150,7 +150,7 @@ void draw_mandala_frame(int cx, int cy,int t) {
             c = COLOR_BLACK;
         }
         set_color(c);
-        vga_plot_pixel(x, y);
+        draw_pixel(x, y);
         wait_ms(150);
     }
 }
