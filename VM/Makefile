@@ -16,12 +16,12 @@ include src/vga/main.mk
 include src/input/main.mk
 
 
-ordenes.o: ordenes.txt
+ordenes.o: ordenes.vg
 	objcopy \
 		--input-target=binary \
 		--output-target=elf32-i386 \
 		--binary-architecture=i386 \
-		ordenes.txt ordenes.o
+		ordenes.vg ordenes.o
 
 %.o: %.c
 	${CC} ${CCFLAGS} -c $< -o $@
