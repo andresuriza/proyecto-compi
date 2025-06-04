@@ -2,14 +2,77 @@
 #include "ast.h"
 #include "y.tab.h"
 #include <math.h>
+#include <string.h>
+#include <stdlib.h>
+
+/*
+void addPredefinedConstants() {
+    Symbol *rojo = malloc(sizeof(Symbol));
+    rojo->name = strdup("rojo");
+    rojo->type = SYM_COLOR;
+    rojo->value.color = COLOR_RED;
+    rojo->next = symbolTable;
+    symbolTable = rojo;
+
+    // Add blue, etc. the same way
+}
+*/
+
+Symbol *findSymbol(const char *name) {
+    for (Symbol *s = symbolTable; s; s = s->next) {
+        if (strcmp(s->name, name) == 0)
+            return s;
+    }
+    return NULL;
+}
+
+Symbol *findOrCreateSymbol(const char *name) {
+    Symbol *s = findSymbol(name);
+    if (s) return s;
+
+    s = malloc(sizeof(Symbol));
+    s->name = strdup(name);
+    s->type = SYM_NUMBER;  // Default
+    s->value.number = 0;
+    s->next = symbolTable;
+    symbolTable = s;
+    return s;
+}
+
+double getSymbolValue(const char *name) {
+    Symbol *s = findSymbol(name);
+    if (!s) {
+        printf(stderr, "Variable no existe, debes declararla primero: %s\n", name);
+        exit(1);
+    }
+    if (s->type != SYM_NUMBER) {
+        printf(stderr, "Error, la variable %s no es un numero \n", name);
+        exit(1);
+    }
+    return s->value.number;
+}
+
+void getColor(ColorValue c) {
+    switch(c) {
+        case ROJO:
+            printf("Rojo \n");
+            break;
+            case AZUL:
+            printf("Azul \n");
+            break;
+            case VERDE:
+            printf("Verde \n");
+            break;
+    }
+}
 
 double ex(nodeType *p) {
     FILE *f = fopen("VM/src/input/interpreter.c", "w");
 
     if (!p) return 0;
     switch(p->type) {
-    case typeCon:       return p->con.value;
-    case typeId: return sym[p->id.i];
+    case typeCon: return p->con.value;
+    case typeId: return getSymbolValue(p->id.name);
     case typeOpr:
         switch(p->opr.oper) {
         case LOOP:
@@ -37,12 +100,38 @@ double ex(nodeType *p) {
                     );
                     return 0;
                 }
-
-        //case PRINT:     printf("%d\n", ex(p->opr.op[0])); return 0;
         case ';':       ex(p->opr.op[0]); return ex(p->opr.op[1]);
-        case '=':   
-                    printf("Assignment = %f \n", ex(p->opr.op[1]));     
-                    return sym[p->opr.op[0]->id.i] = ex(p->opr.op[1]);
+        case '=': {
+                nodeType *lhs = p->opr.op[0];
+                nodeType *rhs = p->opr.op[1];
+                Symbol *s = findOrCreateSymbol(lhs->id.name);
+
+                if (rhs->type == typeCon) {
+                    s->type = rhs->con.type;
+
+                    if (s->type == SYM_COLOR) {
+                        s->value.color = (ColorValue)rhs->con.value;
+                        getColor(s->value.color);
+                    }
+                    else {
+                        s->value.number = rhs->con.value;
+                        printf("Variable equals %f \n", ex(rhs));
+                    }
+                } 
+                
+                else if (rhs->type == typeId) {
+                    Symbol *r = findSymbol(rhs->id.name);
+                    if (!r) { yyerror("undeclared variable"); exit(1); }
+                    *s = *r;  // Copy type and value
+                } 
+                
+                else {
+                    s->type = SYM_NUMBER;
+                    s->value.number = ex(rhs);
+                    printf("Variable equals %f \n", ex(rhs));
+                }
+                return 0;
+        }
         case UMINUS:    return -ex(p->opr.op[0]);
         case COS:       return cos(ex(p->opr.op[0]));
         case SIN:       return sin(ex(p->opr.op[0]));

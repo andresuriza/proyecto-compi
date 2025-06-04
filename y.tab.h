@@ -56,37 +56,38 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     INTEGER = 258,                 /* INTEGER  */
     VARIABLE = 259,                /* VARIABLE  */
-    IF = 260,                      /* IF  */
-    IFX = 261,                     /* IFX  */
-    ELSE = 262,                    /* ELSE  */
-    UMINUS = 263,                  /* UMINUS  */
-    FUNC = 264,                    /* FUNC  */
-    COORD = 265,                   /* COORD  */
-    LINE = 266,                    /* LINE  */
-    RECT = 267,                    /* RECT  */
-    CIRCLE = 268,                  /* CIRCLE  */
-    PIXEL = 269,                   /* PIXEL  */
-    SETCOLOR = 270,                /* SETCOLOR  */
-    WAIT = 271,                    /* WAIT  */
-    FRAME = 272,                   /* FRAME  */
-    LOOP = 273,                    /* LOOP  */
-    LE = 274,                      /* LE  */
-    GE = 275,                      /* GE  */
-    NE = 276,                      /* NE  */
-    EQ = 277,                      /* EQ  */
-    PLUS = 278,                    /* PLUS  */
-    MODULUS = 279,                 /* MODULUS  */
-    DRAW = 280,                    /* DRAW  */
-    TREE = 281,                    /* TREE  */
-    END = 282,                     /* END  */
-    MOVE = 283,                    /* MOVE  */
-    ANIMATE = 284,                 /* ANIMATE  */
-    COS = 285,                     /* COS  */
-    SIN = 286,                     /* SIN  */
-    PRINT = 287,                   /* PRINT  */
-    INT = 288,                     /* INT  */
-    FLOAT = 289,                   /* FLOAT  */
-    COLOR = 290                    /* COLOR  */
+    CTYPE = 260,                   /* CTYPE  */
+    IF = 261,                      /* IF  */
+    IFX = 262,                     /* IFX  */
+    ELSE = 263,                    /* ELSE  */
+    UMINUS = 264,                  /* UMINUS  */
+    FUNC = 265,                    /* FUNC  */
+    COORD = 266,                   /* COORD  */
+    LINE = 267,                    /* LINE  */
+    RECT = 268,                    /* RECT  */
+    CIRCLE = 269,                  /* CIRCLE  */
+    PIXEL = 270,                   /* PIXEL  */
+    SETCOLOR = 271,                /* SETCOLOR  */
+    WAIT = 272,                    /* WAIT  */
+    FRAME = 273,                   /* FRAME  */
+    LOOP = 274,                    /* LOOP  */
+    LE = 275,                      /* LE  */
+    GE = 276,                      /* GE  */
+    NE = 277,                      /* NE  */
+    EQ = 278,                      /* EQ  */
+    PLUS = 279,                    /* PLUS  */
+    MODULUS = 280,                 /* MODULUS  */
+    DRAW = 281,                    /* DRAW  */
+    TREE = 282,                    /* TREE  */
+    END = 283,                     /* END  */
+    MOVE = 284,                    /* MOVE  */
+    ANIMATE = 285,                 /* ANIMATE  */
+    COS = 286,                     /* COS  */
+    SIN = 287,                     /* SIN  */
+    PRINT = 288,                   /* PRINT  */
+    INT = 289,                     /* INT  */
+    FLOAT = 290,                   /* FLOAT  */
+    COLOR = 291                    /* COLOR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -97,49 +98,50 @@ extern int yydebug;
 #define YYUNDEF 257
 #define INTEGER 258
 #define VARIABLE 259
-#define IF 260
-#define IFX 261
-#define ELSE 262
-#define UMINUS 263
-#define FUNC 264
-#define COORD 265
-#define LINE 266
-#define RECT 267
-#define CIRCLE 268
-#define PIXEL 269
-#define SETCOLOR 270
-#define WAIT 271
-#define FRAME 272
-#define LOOP 273
-#define LE 274
-#define GE 275
-#define NE 276
-#define EQ 277
-#define PLUS 278
-#define MODULUS 279
-#define DRAW 280
-#define TREE 281
-#define END 282
-#define MOVE 283
-#define ANIMATE 284
-#define COS 285
-#define SIN 286
-#define PRINT 287
-#define INT 288
-#define FLOAT 289
-#define COLOR 290
+#define CTYPE 260
+#define IF 261
+#define IFX 262
+#define ELSE 263
+#define UMINUS 264
+#define FUNC 265
+#define COORD 266
+#define LINE 267
+#define RECT 268
+#define CIRCLE 269
+#define PIXEL 270
+#define SETCOLOR 271
+#define WAIT 272
+#define FRAME 273
+#define LOOP 274
+#define LE 275
+#define GE 276
+#define NE 277
+#define EQ 278
+#define PLUS 279
+#define MODULUS 280
+#define DRAW 281
+#define TREE 282
+#define END 283
+#define MOVE 284
+#define ANIMATE 285
+#define COS 286
+#define SIN 287
+#define PRINT 288
+#define INT 289
+#define FLOAT 290
+#define COLOR 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "vgraph.y"
+#line 27 "vgraph.y"
 
     double dValue;
-    int sIndex;      // index into symbolTable
+    char* id;      // index into symbolTable
     nodeType* nPtr;
 
-#line 143 "y.tab.h"
+#line 145 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
