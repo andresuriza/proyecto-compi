@@ -156,6 +156,7 @@ void handle_keyboard_interrupt() {
 			}
 			live_command_ready = 1;
 		}
+		//XD
 
 		if (keycode == 28) {
 			// ENTER : Newline
