@@ -27,6 +27,45 @@ int cursor_col = 0;
 char command_buffer[COMMAND_BUFFER_SIZE];
 int command_len = 0;
 
+#define SERIAL_PORT 0x3F8  // COM1
+
+void serial_init() {
+    ioport_out(SERIAL_PORT + 1, 0x00);    // Disable interrupts
+    ioport_out(SERIAL_PORT + 3, 0x80);    // Enable DLAB
+    ioport_out(SERIAL_PORT + 0, 0x03);    // Baud rate lo
+    ioport_out(SERIAL_PORT + 1, 0x00);    // Baud rate hi
+    ioport_out(SERIAL_PORT + 3, 0x03);    // 8 bits, no parity, 1 stop bit
+    ioport_out(SERIAL_PORT + 2, 0xC7);    // Enable FIFO, clear, 14-byte threshold
+    ioport_out(SERIAL_PORT + 4, 0x0B);    // Enable IRQs, RTS/DSR set
+}
+
+int serial_received() {
+    return ioport_in(SERIAL_PORT + 5) & 1;
+}
+
+char serial_read() {
+    while (!serial_received());
+    return ioport_in(SERIAL_PORT);
+}
+
+char serial_buffer[128];
+int serial_index = 0;
+
+void check_serial_input() {
+    if (serial_received()) {
+        char c = serial_read();
+        if (c == '\n' || c == ';') {
+            serial_buffer[serial_index] = '\0';
+            interpret_vgraph_live(serial_buffer);  // o tu función parser actual
+            serial_index = 0;
+        } else {
+            if (serial_index < sizeof(serial_buffer) - 1)
+                serial_buffer[serial_index++] = c;
+        }
+    }
+}
+
+
 void disable_cursor() {
 	ioport_out(0x3D4, 0x0A);
 	ioport_out(0x3D5, 0x20);
@@ -228,6 +267,7 @@ void main() {
 	// 1) Inicializar VGA en modo 320x200x256
     write_regs(g_320x200x256);
     vga_clear_screen();
+	serial_init();
 
     interpret_vgraph("ordenes.txt");  // <- leer desde archivo estático
 
@@ -246,6 +286,7 @@ void main() {
     // Nunca llega aquí
     while (1) {
 		interpret_vgraph_live();
+		check_serial_input();
         __asm__ volatile("hlt");
     }
 }

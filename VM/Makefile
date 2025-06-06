@@ -61,4 +61,9 @@ run-debug: clean debug
 .PHONY: run-iso
 run-iso: ${ISO_OUT}
 	qemu-system-i386 -cdrom $< -monitor stdio
+	
+.PHONY: run-serial
+run-serial: ${KERNEL_OUT}
+	qemu-system-i386 -kernel $< -serial pipe:/tmp/vgraphpipe -monitor stdio
+
 
