@@ -8,9 +8,6 @@ void yyerror (char *);
 %%
 
 "draw" { return DRAW; }
-"rojo" { yylval.id = strdup(yytext); return CTYPE; }
-"verde" { yylval.id = strdup(yytext); return CTYPE; }
-"azul" { yylval.id = strdup(yytext); return CTYPE; }
 "setcolor" { return SETCOLOR; }
 "frame" { return FRAME; }
 "loop" { return LOOP; }
@@ -34,7 +31,7 @@ void yyerror (char *);
 
 [0-9]+\.[0-9]+ {yylval.dValue = atof(yytext); return INTEGER;}
 [0-9]+ {yylval.dValue = atoi(yytext); return INTEGER;}
-[a-z][a-zA-Z0-9]* {yylval.id = strdup(yytext); return VARIABLE;}
+[a-z][a-zA-Z0-9]* {yylval.sIndex = yylval.sIndex = *yytext - 'a'; return VARIABLE;}
 [-+*%/!={};,()><] {return *yytext;}
 "#".* {} // Para comentarios
 [ \t\n]+ ;

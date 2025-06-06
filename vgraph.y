@@ -3,22 +3,18 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "ast.h"
-#include <ctype.h>
-#include <string.h>
 
+/* prototypes */
 nodeType *opr(int oper, int nops, ...);
-nodeType *id(char* name);
+nodeType *id(int i);
 nodeType *con(double value);
-nodeType *conColor(const char *value);
-
-Symbol *symbolTable = NULL;
 
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
-//void addPredefinedConstants();
 
 void yyerror(char *s);
+double sym[26];                    /* symbol table */
 %}
 
 // TODO chequear longitud de identifier
@@ -26,12 +22,12 @@ void yyerror(char *s);
 
 %union {
     double dValue;
-    char* id;      // index into symbolTable
+    int sIndex;      // index into symbolTable
     nodeType* nPtr;
 };
 
 %token <dValue> INTEGER
-%token <id> VARIABLE CTYPE
+%token <sIndex> VARIABLE
 %token IF
 %nonassoc IFX
 %nonassoc ELSE
@@ -67,7 +63,7 @@ void yyerror(char *s);
 %token PRINT
 %token INT FLOAT COLOR
 
-%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment var_type var_list
+%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment
 
 %%
 
@@ -88,7 +84,7 @@ frame:
 
 stmt:
           ';'   { $$ = opr(';', 2, NULL, NULL); }
-        | var_type ';' { $$ = $1; }
+        //| var_type ';' { $$ = $1; }
         | expr ';'  { $$ = $1; }
         | assignment ';'  { $$ = $1; }
         | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { 
@@ -105,15 +101,12 @@ stmt:
         //| '{' stmt_list '}' { $$ = $2; }
         ;
 
+/*
 var_type:
-          '(' INT ')' var_list { $$ = $4; }
-        |  '(' COLOR ')' var_list { $$ = $4; }
+          '(' INT ')' VARIABLE { $$ = opr('=', 2, id($4), 0); }
+          '(' COLOR ')' VARIABLE { $$ = opr('=', 2, id($4), 0); }
         ;
-
-var_list:
-        VARIABLE { $$ = opr('=', 2, id($1), 0); }
-        | var_list ',' VARIABLE { $$ = opr('=', 2, id($3), 0); }
-        ;
+*/
 
 assignment:
            VARIABLE '=' expr { $$ = opr('=', 2, id($1), $3); }
@@ -131,7 +124,6 @@ stmt_list:
 
 expr:
           INTEGER               { $$ = con($1); }
-        | CTYPE              { $$ = conColor($1); }
         | VARIABLE              { $$ = id($1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
@@ -159,31 +151,6 @@ condition:
 
 %%
 
-nodeType *conColor(const char *name) {
-    nodeType *p = malloc(sizeof(nodeType));
-    p->type = typeCon;
-    
-    if (strcmp(name, "rojo") == 0) {
-        p->con.value = ROJO;
-        p->con.type = SYM_COLOR;
-    }
-
-    else if (strcmp(name, "verde") == 0) {
-        p->con.value = VERDE;
-        p->con.type = SYM_COLOR;
-    }
-
-    else if (strcmp(name, "azul") == 0) {
-        p->con.value = AZUL;
-        p->con.type = SYM_COLOR;
-    }  
-    
-    else {
-        yyerror("Unknown color");
-    }
-    return p;
-}
-
 nodeType *con(double value) {
     nodeType *p;
 
@@ -198,16 +165,16 @@ nodeType *con(double value) {
     return p;
 }
 
-nodeType *id(char* name) {
+nodeType *id(int i) {
     nodeType *p;
 
-    // allocate node
+    /* allocate node */
     if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
 
-    // copy information
+    /* copy information */
     p->type = typeId;
-    p->id.name = strdup(name);
+    p->id.i = i;
 
     return p;
 }
@@ -248,8 +215,9 @@ void yyerror(char *s) {
 }
 
 int main(void) {
-    //addPredefinedConstants();
-
+    FILE* fptr;
+    fptr = fopen("file.txt", "w");
+    
     yyparse();
 
     return 0;
