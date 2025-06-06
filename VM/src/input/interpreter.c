@@ -7,6 +7,10 @@
 extern const unsigned char _binary_ordenes_vg_start[];
 extern const unsigned char _binary_ordenes_vg_end[];
 
+// src/input/interpreter.c o kernel.c
+extern char vgraph_live_buffer[256] = {0};
+extern int live_command_ready = 0;  // bandera para ejecución
+
 
 // -----------------------------------------------------------------------------
 // parsear_tokens(): Dada una línea en 'buffer', separa palabras por espacios/tab.
@@ -240,6 +244,26 @@ static void ejecutar_una_linea(const char *line) {
     print(cmd, strlen(cmd));
     print("\n", 1);
 }
+
+void interpret_vgraph_live() {
+    if (live_command_ready) {
+        ejecutar_una_linea(vgraph_live_buffer);  // Usa tu lógica actual
+        live_command_ready = 0; // Limpiar bandera
+    }
+}
+
+void send_vga_command(const char *command) {
+    int i = 0;
+    // Copiar hasta 255 caracteres o hasta encontrar el fin de línea
+    while (command[i] != '\0' && i < 255) {
+        vgraph_live_buffer[i] = command[i];
+        i++;
+    }
+    vgraph_live_buffer[i] = '\0';  // Finaliza como string
+    live_command_ready = 1;
+}
+
+
 
 // -----------------------------------------------------------------------------
 // interpret_vgraph(): recorre los bytes entre _binary_ordenes_txt_start y

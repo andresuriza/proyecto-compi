@@ -148,6 +148,15 @@ void handle_keyboard_interrupt() {
 	if (status & 0x1) {
 		char keycode = ioport_in(KEYBOARD_DATA_PORT);
 		if (keycode < 0 || keycode >= 128) return;
+		else if (keycode == SCAN_M) {  // si presiona 'm'
+			// Simular carga en vivo del comando
+			char test[] = "tree 160 180 50 90 5";  // comando válido
+			for (int i = 0; i < sizeof(test); i++) {
+				send_vga_command("animate tree (160,180,60,90,6);");
+			}
+			live_command_ready = 1;
+		}
+
 		if (keycode == 28) {
 			// ENTER : Newline
 			cursor_row++;
@@ -235,6 +244,7 @@ void main() {
 
     // Nunca llega aquí
     while (1) {
+		interpret_vgraph_live();
         __asm__ volatile("hlt");
     }
 }
