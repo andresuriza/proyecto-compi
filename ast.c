@@ -85,7 +85,11 @@ double ex(nodeType *p) {
                         else if (p->opr.nops > 2)
                             ex(p->opr.op[2]);
                         return 0;
-        case SETCOLOR: printf("Color set to %f \n", ex(p->opr.op[0])); return 0;
+        case SETCOLOR: 
+                    Symbol *s = findSymbol(p->opr.op[0]->id.name);
+                    printf("Color set to ");
+                    getColor(s->value.color); 
+                    return 0;
         case WAIT: printf("Waiting: %f \n", ex(p->opr.op[0])); return 0;
         case PIXEL: 
                     printf("drawing at: (%f, %f) \n", ex(p->opr.op[0]), ex(p->opr.op[1])); 
