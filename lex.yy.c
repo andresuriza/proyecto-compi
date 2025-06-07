@@ -798,17 +798,17 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 11 "vgraph.l"
-{ yylval.id = strdup(yytext); return CTYPE; }
+{ yylval.id = strdup(yytext); return COLORTYPE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 12 "vgraph.l"
-{ yylval.id = strdup(yytext); return CTYPE; }
+{ yylval.id = strdup(yytext); return COLORTYPE; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 13 "vgraph.l"
-{ yylval.id = strdup(yytext); return CTYPE; }
+{ yylval.id = strdup(yytext); return COLORTYPE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP

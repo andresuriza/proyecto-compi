@@ -56,7 +56,7 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     INTEGER = 258,                 /* INTEGER  */
     VARIABLE = 259,                /* VARIABLE  */
-    CTYPE = 260,                   /* CTYPE  */
+    COLORTYPE = 260,               /* COLORTYPE  */
     IF = 261,                      /* IF  */
     IFX = 262,                     /* IFX  */
     ELSE = 263,                    /* ELSE  */
@@ -87,7 +87,9 @@ extern int yydebug;
     PRINT = 288,                   /* PRINT  */
     INT = 289,                     /* INT  */
     FLOAT = 290,                   /* FLOAT  */
-    COLOR = 291                    /* COLOR  */
+    COLOR = 291,                   /* COLOR  */
+    C_DECL = 292,                  /* C_DECL  */
+    I_DECL = 293                   /* I_DECL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -98,7 +100,7 @@ extern int yydebug;
 #define YYUNDEF 257
 #define INTEGER 258
 #define VARIABLE 259
-#define CTYPE 260
+#define COLORTYPE 260
 #define IF 261
 #define IFX 262
 #define ELSE 263
@@ -130,6 +132,8 @@ extern int yydebug;
 #define INT 289
 #define FLOAT 290
 #define COLOR 291
+#define C_DECL 292
+#define I_DECL 293
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -141,7 +145,7 @@ union YYSTYPE
     char* id;      // index into symbolTable
     nodeType* nPtr;
 
-#line 145 "y.tab.h"
+#line 149 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
