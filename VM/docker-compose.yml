@@ -8,6 +8,6 @@ services:
         hostname: pkos_dev
         volumes:
             - .:/pkos
-            - /tmp/vgraphpipe:/tmp/vgraphpipe
+            - /tmp:/tmp
         network_mode: 'host' # makes x11 windows work for `make run`
         entrypoint: ['make', 'run']

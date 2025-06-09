@@ -64,6 +64,15 @@ run-iso: ${ISO_OUT}
 	
 .PHONY: run-serial
 run-serial: ${KERNEL_OUT}
+	# 0) Matar cualquier qemu-system-i386 que esté usando /tmp/vgraphpipe
+	-@pkill -f "qemu-system-i386.*pipe:/tmp/vgraphpipe" 2>/dev/null || true
+	# 1) Eliminar cualquier resto en /tmp/vgraphpipe*
+	rm -rf  /tmp/vgraphpipe
+	rm -f   /tmp/vgraphpipe.in /tmp/vgraphpipe.out
+	# 2) Crear las dos FIFOs que QEMU necesita
+	mkfifo   /tmp/vgraphpipe.in
+	mkfifo   /tmp/vgraphpipe.out
+	# 3) Arrancar QEMU apuntando a pipe:/tmp/vgraphpipe
 	qemu-system-i386 -kernel $< -serial pipe:/tmp/vgraphpipe -monitor stdio
 
 

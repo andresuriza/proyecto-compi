@@ -56,7 +56,7 @@ void check_serial_input() {
         char c = serial_read();
         if (c == '\n' || c == ';') {
             serial_buffer[serial_index] = '\0';
-            interpret_vgraph_live(serial_buffer);  // o tu función parser actual
+            send_vga_command(serial_buffer);  // o tu función parser actual
             serial_index = 0;
         } else {
             if (serial_index < sizeof(serial_buffer) - 1)
