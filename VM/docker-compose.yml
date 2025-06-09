@@ -9,5 +9,6 @@ services:
         volumes:
             - .:/pkos
             - /tmp:/tmp
-        network_mode: 'host' # makes x11 windows work for `make run`
-        entrypoint: ['make', 'run']
+        network_mode: 'host'
+        entrypoint: tail -f /dev/null
+
