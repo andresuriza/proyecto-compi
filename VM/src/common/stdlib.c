@@ -112,3 +112,129 @@ bool streq(char* string1, int str1len, char* string2, int str2len) {
     return true;
 }
 
+/*
+ * memcpy: copia n bytes de src a dst (no se solapan).
+ */
+void *memcpy(void *dst, const void *src, size_t n) {
+    unsigned char *d = (unsigned char*)dst;
+    const unsigned char *s = (const unsigned char*)src;
+    while (n--) {
+        *d++ = *s++;
+    }
+    return dst;
+}
+
+/*
+ * strchr: busca el primer carácter c (convertido a char) en s,
+ * devuelve puntero a él o NULL si no se encuentra.
+ */
+char *strchr(const char *s, int c) {
+    char ch = (char)c;
+    for (; *s; s++) {
+        if (*s == ch) return (char*)s;
+    }
+    return (ch == '\0') ? (char*)s : NULL;
+}
+
+/*
+ * strstr: busca la primera aparición de needle en haystack,
+ * devuelve puntero al inicio o NULL si no se encuentra.
+ */
+char *strstr(const char *haystack, const char *needle) {
+    if (!*needle) return (char*)haystack;
+    for (; *haystack; haystack++) {
+        const char *h = haystack, *n = needle;
+        while (*h && *n && *h == *n) {
+            h++; n++;
+        }
+        if (!*n) return (char*)haystack;
+    }
+    return NULL;
+}
+
+/*
+ * strncmp: compara hasta n caracteres de a y b.
+ *  Devuelve 0 si iguales, <0 si a<b, >0 si a>b.
+ */
+int strncmp(const char *a, const char *b, size_t n) {
+    size_t i;
+    for (i = 0; i < n; i++) {
+        unsigned char ca = (unsigned char)a[i];
+        unsigned char cb = (unsigned char)b[i];
+        if (ca != cb || ca == '\0' || cb == '\0') {
+            return (int)ca - (int)cb;
+        }
+    }
+    return 0;
+}
+
+/*
+ * strtok: tokeniza s en delimitadores sep.
+ *  Llamadas posteriores con s==NULL continúan la tokenización.
+ */
+char *strtok(char *s, const char *sep) {
+    static char *saveptr;
+    if (s == NULL) {
+        s = saveptr;
+        if (s == NULL) return NULL;
+    }
+    /* Saltar delimitadores iniciales */
+    s += strspn(s, sep);
+    if (*s == '\0') {
+        saveptr = NULL;
+        return NULL;
+    }
+    /* Encontrar final del token */
+    char *tok = s;
+    s = strpbrk(tok, sep);
+    if (s) {
+        *s = '\0';
+        saveptr = s + 1;
+    } else {
+        saveptr = NULL;
+    }
+    return tok;
+}
+
+/*
+ * strspn: longitud del prefijo de s que contiene solo bytes de accept.
+ */
+size_t strspn(const char *s, const char *accept) {
+    const char *p;
+    size_t count = 0;
+    for (; *s; s++) {
+        for (p = accept; *p; p++) {
+            if (*s == *p) break;
+        }
+        if (!*p) break;
+        count++;
+    }
+    return count;
+}
+
+/*
+ * strpbrk: busca en s el primer carácter que esté en accept,
+ * devuelve puntero a él o NULL.
+ */
+char *strpbrk(const char *s, const char *accept) {
+    for (; *s; s++) {
+        for (const char *a = accept; *a; a++) {
+            if (*s == *a) return (char*)s;
+        }
+    }
+    return NULL;
+}
+
+char *strncpy(char *dst, const char *src, size_t n) {
+    size_t i = 0;
+    // Copiar caracteres de src
+    for (; i < n && src[i] != '\0'; i++) {
+        dst[i] = src[i];
+    }
+    // Rellenar con '\0' si src terminó antes
+    for (; i < n; i++) {
+        dst[i] = '\0';
+    }
+    return dst;
+}
+

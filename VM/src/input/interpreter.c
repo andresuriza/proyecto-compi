@@ -2,15 +2,101 @@
 
 #include "../vga/vga.h"    
 #include "../vga/vga_color.h"  
-#include "../common/stdlib.h" // Para atoi(), atof(), strcmp(), strlen()
+#include "../common/stdlib.h" // Para parse_int_or_var(), atof(), strcmp(), strlen()
 
 extern const unsigned char _binary_ordenes_vg_start[];
 extern const unsigned char _binary_ordenes_vg_end[];
 
 // src/input/interpreter.c o kernel.c
-extern char vgraph_live_buffer[256] = {0};
-extern int live_command_ready = 0;  // bandera para ejecución
+char vgraph_live_buffer[256] = {0};
+int live_command_ready = 0;  // bandera para ejecución
 
+static int   evaluar_condicion(int lhs, const char *op, int rhs);
+static void  interpretar_bloque(const char *start, const char *end);
+static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
+static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
+static int parse_int_or_var(const char *s);
+
+
+#define MAX_VARS 32
+#define MAX_NAME 16
+
+static char  var_names[MAX_VARS][MAX_NAME];
+static int   var_values[MAX_VARS];
+static int   var_count = 0;
+
+
+/**
+ * eval_expr: evalúa una expresión simple de suma/resta cuyos tokens
+ * están en args[start..argc-1]. Retorna el resultado como int.
+ */
+static int eval_expr(char *args[], int argc, int start) {
+    // 1) Valor inicial
+    int acc = parse_int_or_var(args[start]);
+
+    // 2) Recorremos pares (op, operando)
+    for (int i = start + 1; i + 1 < argc; i += 2) {
+        char *op  = args[i];
+        int   rhs = parse_int_or_var(args[i+1]);
+        if      (strcmp(op, "+") == 0) acc += rhs;
+        else if (strcmp(op, "-") == 0) acc -= rhs;
+        else {
+            print("Error: operador desconocido en expr\n", 33);
+        }
+    }
+    return acc;
+}
+
+
+/** Busca índice de var, o -1 si no existe */
+static int find_var(const char *name) {
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(var_names[i], name) == 0) return i;
+    }
+    return -1;
+}
+
+/** Crea o actualiza una variable */
+static void set_var(const char *name, int value) {
+    int idx = find_var(name);
+    if (idx >= 0) {
+        var_values[idx] = value;
+    } else if (var_count < MAX_VARS) {
+        strncpy(var_names[var_count], name, MAX_NAME-1);
+        var_names[var_count][MAX_NAME-1] = '\0';
+        var_values[var_count] = value;
+        var_count++;
+    } else {
+        print("Error: tabla de variables llena\n", 31);
+    }
+}
+
+/** Devuelve el valor de la variable, o 0 si no existe */
+static int get_var(const char *name) {
+    int idx = find_var(name);
+    return (idx >= 0) ? var_values[idx] : 0;
+}
+
+static int parse_int_or_var(const char *s) {
+    // Detectar número (primer carácter dígito o signo+digito)
+    if ((s[0] >= '0' && s[0] <= '9') ||
+        ((s[0] == '-' || s[0] == '+') && (s[1] >= '0' && s[1] <= '9'))) {
+        return atoi(s);
+    }
+    return get_var(s);
+}
+
+
+
+static int evaluar_condicion(int lhs, const char *op, int rhs) {
+    if      (strcmp(op, "==") == 0) return lhs == rhs;
+    else if (strcmp(op, "!=") == 0) return lhs != rhs;
+    else if (strcmp(op, ">=") == 0) return lhs >= rhs;
+    else if (strcmp(op, "<=") == 0) return lhs <= rhs;
+    else if (strcmp(op, ">")  == 0) return lhs >  rhs;
+    else if (strcmp(op, "<")  == 0) return lhs <  rhs;
+    return -1; // operador no reconocido
+}
 
 // -----------------------------------------------------------------------------
 // parsear_tokens(): Dada una línea en 'buffer', separa palabras por espacios/tab.
@@ -98,6 +184,15 @@ static void ejecutar_una_linea(const char *line) {
     // args[0] es el nombre del comando
     char *cmd = args[0];
     char *cmd2 = args[1];
+    // ——— Asignación simple: var = expr
+    if (argc >= 3 && strcmp(args[1], "=") == 0) {
+      // args[2..argc-1] contienen la expresión entera
+      int val = eval_expr(args, argc, 2);
+      set_var(args[0], val);
+      return;
+    }
+
+
 
     // ================================================================
     // 1) Comando: animate_tree x y length angle depth
@@ -106,8 +201,8 @@ static void ejecutar_una_linea(const char *line) {
     if (strcmp(cmd, "draw") == 0) {
         if(strcmp(cmd2,"pixel") == 0){
           if (argc == 4) {
-            int x            = atoi(args[2]);
-            int y            = atoi(args[3]);
+            int x            = parse_int_or_var(args[2]);
+            int y            = parse_int_or_var(args[3]);
             draw_pixel(x,y);
           } else {
             println("Error: draw_pixel requiere 2 parámetros\n", 40);
@@ -116,10 +211,10 @@ static void ejecutar_una_linea(const char *line) {
         }
         if (strcmp(cmd2, "line") == 0) {
           if (argc == 6) {
-              int x0            = atoi(args[2]);
-              int y0            = atoi(args[3]);
-              int x1            = atoi(args[4]);
-              int y1            = atoi(args[5]);
+              int x0            = parse_int_or_var(args[2]);
+              int y0            = parse_int_or_var(args[3]);
+              int x1            = parse_int_or_var(args[4]);
+              int y1            = parse_int_or_var(args[5]);
               draw_line(x0,y0,x1,y1);
           } else {
               println("Error: draw_line requiere 4 parámetros\n", 40);
@@ -128,10 +223,10 @@ static void ejecutar_una_linea(const char *line) {
        }
       if (strcmp(cmd2, "rect") == 0) {
         if (argc == 6) {
-            int x            = atoi(args[2]);
-            int y            = atoi(args[3]);
-            int width           = atoi(args[4]);
-            int height            = atoi(args[5]);
+            int x            = parse_int_or_var(args[2]);
+            int y            = parse_int_or_var(args[3]);
+            int width           = parse_int_or_var(args[4]);
+            int height            = parse_int_or_var(args[5]);
             draw_rect(x,y,width,height);
         } else {
             println("Error: draw_rect requiere 4 parámetros\n", 40);
@@ -140,9 +235,9 @@ static void ejecutar_una_linea(const char *line) {
       }
       if (strcmp(cmd2, "circle") == 0) {
         if (argc == 5) {
-          int xc           = atoi(args[2]);
-          int yc            = atoi(args[3]);
-          int r           = atoi(args[4]);
+          int xc           = parse_int_or_var(args[2]);
+          int yc            = parse_int_or_var(args[3]);
+          int r           = parse_int_or_var(args[4]);
           draw_circle(xc,yc,r);
         } else {
             println("Error: draw_circle requiere 3 parámetros\n", 40);
@@ -153,11 +248,11 @@ static void ejecutar_una_linea(const char *line) {
     if(strcmp(cmd, "animate") == 0) {
       if (strcmp(cmd2, "tree") == 0) {
           if (argc == 7) {
-              int x      = atoi(args[2]);
-              int y      = atoi(args[3]);
+              int x      = parse_int_or_var(args[2]);
+              int y      = parse_int_or_var(args[3]);
               double len = atof(args[4]);
               double ang = atof(args[5]);
-              int depth  = atoi(args[6]);
+              int depth  = parse_int_or_var(args[6]);
               animate_tree(x, y, len, ang, depth);
           } else {
               println("Error: animate_tree requiere 5 parámetros\n", 37);
@@ -171,8 +266,8 @@ static void ejecutar_una_linea(const char *line) {
       // ================================================================
       if (strcmp(cmd2, "mandala") == 0) {
           if (argc == 4) {
-              int cx     = atoi(args[2]);
-              int cy     = atoi(args[3]);
+              int cx     = parse_int_or_var(args[2]);
+              int cy     = parse_int_or_var(args[3]);
               animate_mandala(cx, cy);
           } else {
               println("Error: animate_mandala requiere 2 parámetros\n", 40);
@@ -186,9 +281,9 @@ static void ejecutar_una_linea(const char *line) {
       // ================================================================
       if (strcmp(cmd2, "spiral") == 0) {
           if (argc == 5) {
-              int cx            = atoi(args[2]);
-              int cy            = atoi(args[3]);
-              int r          = atoi(args[4]);
+              int cx            = parse_int_or_var(args[2]);
+              int cy            = parse_int_or_var(args[3]);
+              int r          = parse_int_or_var(args[4]);
               animate_spiral(cx, cy, r);
           } else {
               println("Error: animate_spiral requiere 3 parámetros\n", 40);
@@ -229,7 +324,7 @@ static void ejecutar_una_linea(const char *line) {
     
     if (strcmp(cmd, "wait") == 0) {
         if (argc == 2) {
-            int s           = atoi(args[1]);
+            int s           = parse_int_or_var(args[1]);
             wait(s);
         } else {
             println("Error: wait requiere 1 parámetros\n", 40);
@@ -274,37 +369,192 @@ void interpret_vgraph(const char *unused_path) {
     const unsigned char *end = _binary_ordenes_vg_end;
     const unsigned char *line_start = p;
 
-    while (p < end) {
-        if (*p == '\r') {
-            // ignoramos carriage return (CR)
-            p++;
-            continue;
-        }
+  while (p < end) {
+      if (*p == '\r') { p++; continue; }
 
-        // Si encontramos '\n' o estamos justo en el último byte
-        if (*p == '\n' || (p == end - 1 && *p != '\n')) {
-            // Determinar la longitud de la línea (sin incluir '\n')
-            int line_len = 0;
-            const unsigned char *q = line_start;
-            // Si es el último carácter y no es '\n', lo incluimos
-            int include_last = (p == end - 1 && *p != '\n') ? 1 : 0;
-            int target_len = (int)(p - line_start) + include_last;
+      if (*p == '\n') {
+          int line_len = (int)(p - line_start);
+          if (line_len > 0 && line_len < 80) {
+              // 1) Montar línea sin copiar a buffer intermedio
+              char *start = (char*)line_start;
+              // 1a) Saltar espacios iniciales
+              while (*start == ' ' || *start == '\t') {
+                  start++;
+                  line_len--;
+              }
+              // 2) ¿Es un if?
+              if (line_len >= 2 && strncmp(start, "if", 2) == 0 &&
+                  (start[2] == ' ' || start[2] == '\t' || start[2] == '(')) {
+                  // Ejecutamos condicional y obtenemos nuevo p
+                  const unsigned char *newp = ejecutar_condicional((unsigned char*)start, end);
+                  // avanzamos línea a tras newp
+                  p = newp;
+                  line_start = p;
+                  continue;
+              }
+              if (line_len >= 5 && strncmp(start, "while", 5) == 0 &&
+                 (start[5] == ' ' || start[5] == '\t' || start[5] == '(')) {
+                 const unsigned char *newp = ejecutar_bucle((unsigned char*)start, end);
+                 p = newp;
+                 line_start = p;
+                 continue;
+             }
 
-            if (target_len > 0 && target_len < 80) {
-                // Copiar la línea en un buffer C (añade '\0')
-                char buffer_line[80];
-                for (line_len = 0; line_len < target_len; line_len++) {
-                    buffer_line[line_len] = (char)line_start[line_len];
-                }
-                buffer_line[line_len] = '\0';
-                // Ejecutar el comando si no es una línea vacía
-                ejecutar_una_linea(buffer_line);
+              // 3) Línea normal: copiar y ejecutar
+              char buffer_line[80];
+              memcpy(buffer_line, start, line_len);
+              buffer_line[line_len] = '\0';
+              ejecutar_una_linea(buffer_line);
+          }
+          // Preparamos la siguiente línea
+          line_start = p + 1;
+      }
+      p++;
+  }
+}
+
+
+// start apunta justo después de '{' y end apunta al '}' correspondiente
+static void interpretar_bloque(const char *start, const char *end) {
+    char buf[256];
+    int len = end - start;
+    if (len <= 0) return;
+    if (len >= (int)sizeof(buf)) len = sizeof(buf) - 1;
+    memcpy(buf, start, len);
+    buf[len] = '\0';
+
+    // Recorremos buf buscando newlines
+    char *line = buf;
+    for (char *q = buf; *q; ++q) {
+        if (*q == '\n') {
+            *q = '\0';
+            // Quitar espacios al inicio
+            char *s = line;
+            while (*s == ' ' || *s == '\t') s++;
+            if (*s) {
+                ejecutar_una_linea(s);
             }
-            // Avanzar al siguiente posible inicio de línea
-            line_start = p + 1;
+            line = q + 1;
         }
-
-        p++;
+    }
+    // Última línea, si no acaba en '\n'
+    char *s = line;
+    while (*s == ' ' || *s == '\t') s++;
+    if (*s) {
+        ejecutar_una_linea(s);
     }
 }
+
+
+static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end) {
+    // 1) Extraer la condición entre paréntesis
+    const char *lp = strchr((const char*)p, '(');
+    const char *rp = lp ? strchr(lp, ')') : NULL;
+    if (!lp || !rp) return p;
+
+    char cond[64];
+    int clen = rp - lp - 1;
+    if (clen >= (int)sizeof(cond)) clen = sizeof(cond) - 1;
+    memcpy(cond, lp + 1, clen);
+    cond[clen] = '\0';
+
+    // Tokenizar: lhs op rhs
+    char *tok_lhs = strtok(cond, " <>!=\t");
+    char *tok_op  = strtok(NULL, "0123456789abcdefghijklmnopqrstuvwxyz_");
+    char *tok_rhs = strtok(NULL, " <>!=\t");
+  
+    int lhs = eval_expr(&tok_lhs, /*argc=*/3, /*start=*/0);
+    int rhs = eval_expr(&tok_rhs, /*argc=*/3, /*start=*/0);
+    int ok  = evaluar_condicion(lhs, tok_op, rhs);
+
+    // 2) Ubicar primer bloque { ... }
+    const unsigned char *b1 = strchr((const char*)rp, '{');
+    if (!b1) return p;
+    int depth = 1;
+    const unsigned char *q = b1 + 1;
+    while (q < end && depth) {
+        if (*q == '{') depth++;
+        else if (*q == '}') depth--;
+        q++;
+    }
+    const unsigned char *b1_end = q - 1;
+
+    // 3) Buscar bloque else { ... } (opcional)
+    const unsigned char *b2 = NULL, *b2_end = NULL;
+    const unsigned char *else_pos = strstr((const char*)b1_end + 1, "else");
+    if (else_pos) {
+        const unsigned char *b = strchr((const char*)else_pos, '{');
+        if (b) {
+            depth = 1;
+            q = b + 1;
+            while (q < end && depth) {
+                if (*q == '{') depth++;
+                else if (*q == '}') depth--;
+                q++;
+            }
+            b2     = b + 1;
+            b2_end = q - 1;
+        }
+    }
+
+    // 4) Ejecutar el bloque correcto
+    if (ok == 1) {
+        interpretar_bloque((const char*)b1 + 1, (const char*)b1_end);
+    } else if (ok == 0 && b2) {
+        interpretar_bloque((const char*)b2, (const char*)b2_end);
+    }
+
+    // 5) Retornar posición tras el bloque procesado
+    return (b2_end ? b2_end : b1_end) + 1;
+}
+
+// --- Implementación de ejecutar_bucle (puedes ponerla junto a ejecutar_condicional) ---
+static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end) {
+    // 1) Extraer condición igual que en ejecutar_condicional
+    const char *lp = strchr((const char*)p, '(');
+    const char *rp = lp ? strchr(lp, ')') : NULL;
+    if (!lp || !rp) return p;
+
+    char cond[64];
+    int clen = rp - lp - 1;
+    if (clen >= (int)sizeof(cond)) clen = sizeof(cond) - 1;
+    memcpy(cond, lp + 1, clen);
+    cond[clen] = '\0';
+
+    // Guardamos posición de inicio de bloque
+    const unsigned char *b = strchr((const char*)rp, '{');
+    if (!b) return p;
+    // Encontrar cierre correspondiente
+    int depth = 1;
+    const unsigned char *q = b + 1;
+    while (q < end && depth) {
+        if (*q == '{') depth++;
+        else if (*q == '}') depth--;
+        q++;
+    }
+    const unsigned char *b_start = b + 1;
+    const unsigned char *b_end   = q - 1;
+
+    // 2) Repetir interpretación del bloque mientras la condición sea cierta
+    while (1) {
+        // Re-evaluar condición
+        // (repite misma tokenización que en if)
+        char tmp[64];
+        strncpy(tmp, cond, sizeof(tmp));
+        char *tok_lhs = strtok(tmp, " <>!=\t");
+        char *tok_op  = strtok(NULL, "0123456789abcdefghijklmnopqrstuvwxyz_");
+        char *tok_rhs = strtok(NULL, " <>!=\t");
+        int lhs = eval_expr(&tok_lhs, /*argc=*/3, /*start=*/0);
+        int rhs = eval_expr(&tok_rhs, /*argc=*/3, /*start=*/0);
+        int ok  = evaluar_condicion(lhs, tok_op, rhs);
+        if (ok != 1) break;
+
+        // Ejecutar bloque
+        interpretar_bloque((const char*)b_start, (const char*)b_end);
+    }
+
+    // 3) Retornar puntero tras '}'
+    return b_end + 1;
+}
+
 
