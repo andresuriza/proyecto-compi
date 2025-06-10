@@ -238,3 +238,40 @@ char *strncpy(char *dst, const char *src, size_t n) {
     return dst;
 }
 
+/**
+ * strcpy: copia la cadena apuntada por src (incluyendo el \0 final)
+ * a la memoria apuntada por dest.
+ * Retorna dest.
+ */
+char *strcpy(char *dest, const char *src) {
+    char *ret = dest;
+    while ((*dest++ = *src++) != '\0') {
+        /* copia carácter y avanza */
+    }
+    return ret;
+}
+
+/**
+ * memmove: copia `n` bytes de la zona de memoria `src` a la zona `dest`,
+ * manejando correctamente los solapamientos.
+ * Retorna el puntero `dest`.
+ */
+void *memmove(void *dest, const void *src, size_t n) {
+    unsigned char *d = (unsigned char *)dest;
+    const unsigned char *s = (const unsigned char *)src;
+    if (d < s) {
+        // Copia hacia adelante
+        for (size_t i = 0; i < n; i++) {
+            d[i] = s[i];
+        }
+    } else if (d > s) {
+        // Copia hacia atrás para evitar sobreescrituras
+        for (size_t i = n; i != 0; i--) {
+            d[i-1] = s[i-1];
+        }
+    }
+    // si d == s, no hace nada
+    return dest;
+}
+
+

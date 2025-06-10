@@ -1,6 +1,11 @@
-setcolor (green);
-draw pixel (80,80);
-draw rect (100, 100, 10, 10);
-setcolor (red);
-draw line (20, 20, 40, 40);
-wait (50);
+x = 100;
+y = 20;
+if (10 < 1) {
+	setcolor (red);
+	draw pixel (x,y);
+} 
+else {
+	setcolor (blue);
+	draw pixel (x,y);
+}
+

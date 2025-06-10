@@ -4,6 +4,23 @@
 #include "../vga/vga_color.h"  
 #include "../common/stdlib.h" // Para parse_int_or_var(), atof(), strcmp(), strlen()
 
+/**
+ * trim: elimina espacios y tabs al principio y al final de la cadena s.
+ */
+static void trim(char *s) {
+    char *p = s, *end;
+    // 1) saltar espacios iniciales
+    while (*p == ' ' || *p == '\t') p++;
+    if (p != s) memmove(s, p, strlen(p) + 1);
+
+    // 2) quitar espacios finales
+    end = s + strlen(s) - 1;
+    while (end >= s && (*end == ' ' || *end == '\t')) {
+        *end = '\0';
+        end--;
+    }
+}
+
 extern const unsigned char _binary_ordenes_vg_start[];
 extern const unsigned char _binary_ordenes_vg_end[];
 
@@ -14,8 +31,10 @@ int live_command_ready = 0;  // bandera para ejecución
 static int   evaluar_condicion(int lhs, const char *op, int rhs);
 static void  interpretar_bloque(const char *start, const char *end);
 static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
-static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
+//static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
 static int parse_int_or_var(const char *s);
+static int find_op(const char *cond, int *op_len);
+static int eval_condition(const char *cond_str); 
 
 
 #define MAX_VARS 32
@@ -24,6 +43,9 @@ static int parse_int_or_var(const char *s);
 static char  var_names[MAX_VARS][MAX_NAME];
 static int   var_values[MAX_VARS];
 static int   var_count = 0;
+
+
+
 
 
 /**
@@ -97,6 +119,46 @@ static int evaluar_condicion(int lhs, const char *op, int rhs) {
     else if (strcmp(op, "<")  == 0) return lhs <  rhs;
     return -1; // operador no reconocido
 }
+
+static int find_op(const char *cond, int *op_len) {
+    const char *ops[] = {"==","!=",">=","<=",">","<"};
+    for (int i = 0; i < 6; i++) {
+        const char *p = strstr(cond, ops[i]);
+        if (p) {
+            *op_len = strlen(ops[i]);
+            return (int)(p - cond);
+        }
+    }
+    return -1;
+}
+
+static int eval_condition(const char *cond_str) {
+    int op_len, pos = find_op(cond_str, &op_len);
+    if (pos < 0) return -1;
+
+    char lhs_s[64], rhs_s[64], op_s[3];
+
+    // extraer lhs
+    memcpy(lhs_s, cond_str, pos);
+    lhs_s[pos] = '\0';
+    // extraer op
+    memcpy(op_s, cond_str + pos, op_len);
+    op_s[op_len] = '\0';
+    // extraer rhs
+    strncpy(rhs_s, cond_str + pos + op_len, sizeof(rhs_s)-1);
+    rhs_s[sizeof(rhs_s)-1] = '\0';
+
+    // recortar espacios
+    trim(lhs_s);
+    trim(rhs_s);
+
+    // ahora sí parsear y comparar
+    int lhs = eval_expr((char*[]){lhs_s}, 1, 0);
+    int rhs = eval_expr((char*[]){rhs_s}, 1, 0);
+    return evaluar_condicion(lhs, op_s, rhs);
+}
+
+
 
 // -----------------------------------------------------------------------------
 // parsear_tokens(): Dada una línea en 'buffer', separa palabras por espacios/tab.
@@ -392,13 +454,6 @@ void interpret_vgraph(const char *unused_path) {
                   line_start = p;
                   continue;
               }
-              if (line_len >= 5 && strncmp(start, "while", 5) == 0 &&
-                 (start[5] == ' ' || start[5] == '\t' || start[5] == '(')) {
-                 const unsigned char *newp = ejecutar_bucle((unsigned char*)start, end);
-                 p = newp;
-                 line_start = p;
-                 continue;
-             }
 
               // 3) Línea normal: copiar y ejecutar
               char buffer_line[80];
@@ -446,29 +501,26 @@ static void interpretar_bloque(const char *start, const char *end) {
 }
 
 
-static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end) {
-    // 1) Extraer la condición entre paréntesis
-    const char *lp = strchr((const char*)p, '(');
-    const char *rp = lp ? strchr(lp, ')') : NULL;
-    if (!lp || !rp) return p;
+static const unsigned char* ejecutar_condicional(const unsigned char *p,
+                                                const unsigned char *end) {
+    // 1) Localizar paréntesis de la condición
+    const char *lpar = strchr((const char*)p, '(');
+    if (!lpar) return p;
+    const char *rpar = strchr(lpar, ')');
+    if (!rpar) return p;
 
+    // 2) Extraer la condición en un buffer
+    int cond_len = (int)(rpar - lpar - 1);
+    if (cond_len > 63) cond_len = 63;
     char cond[64];
-    int clen = rp - lp - 1;
-    if (clen >= (int)sizeof(cond)) clen = sizeof(cond) - 1;
-    memcpy(cond, lp + 1, clen);
-    cond[clen] = '\0';
+    strncpy(cond, lpar + 1, cond_len);
+    cond[cond_len] = '\0';
 
-    // Tokenizar: lhs op rhs
-    char *tok_lhs = strtok(cond, " <>!=\t");
-    char *tok_op  = strtok(NULL, "0123456789abcdefghijklmnopqrstuvwxyz_");
-    char *tok_rhs = strtok(NULL, " <>!=\t");
-  
-    int lhs = eval_expr(&tok_lhs, /*argc=*/3, /*start=*/0);
-    int rhs = eval_expr(&tok_rhs, /*argc=*/3, /*start=*/0);
-    int ok  = evaluar_condicion(lhs, tok_op, rhs);
+    // 3) Evaluar la condición (0 = falso, 1 = verdadero, <0 error)
+    int ok = eval_condition(cond);
 
-    // 2) Ubicar primer bloque { ... }
-    const unsigned char *b1 = strchr((const char*)rp, '{');
+    // 4) Encontrar bloque if { … }
+    const unsigned char *b1 = strchr((const char*)rpar, '{');
     if (!b1) return p;
     int depth = 1;
     const unsigned char *q = b1 + 1;
@@ -479,82 +531,44 @@ static const unsigned char* ejecutar_condicional(const unsigned char *p, const u
     }
     const unsigned char *b1_end = q - 1;
 
-    // 3) Buscar bloque else { ... } (opcional)
+    // 5) Intentar localizar bloque else { … } (si existe)
     const unsigned char *b2 = NULL, *b2_end = NULL;
-    const unsigned char *else_pos = strstr((const char*)b1_end + 1, "else");
-    if (else_pos) {
-        const unsigned char *b = strchr((const char*)else_pos, '{');
-        if (b) {
+    const unsigned char *scan = b1_end + 1;
+    // avanzar espacios y saltos de línea
+    while (scan < end && (*scan==' '||*scan=='\t'||*scan=='\r'||*scan=='\n'))
+        scan++;
+    // solo si viene "else" y a continuación '{'
+    if (scan + 4 < end && strncmp((const char*)scan, "else", 4)==0) {
+        const unsigned char *eb = strchr((const char*)scan+4, '{');
+        if (eb) {
             depth = 1;
-            q = b + 1;
+            q = eb + 1;
             while (q < end && depth) {
                 if (*q == '{') depth++;
                 else if (*q == '}') depth--;
                 q++;
             }
-            b2     = b + 1;
+            b2     = eb;
             b2_end = q - 1;
         }
     }
 
-    // 4) Ejecutar el bloque correcto
+    // 6) Ejecutar solo el bloque correspondiente
     if (ok == 1) {
+        // if verdadero
         interpretar_bloque((const char*)b1 + 1, (const char*)b1_end);
     } else if (ok == 0 && b2) {
-        interpretar_bloque((const char*)b2, (const char*)b2_end);
+        // if falso y hay else
+        interpretar_bloque((const char*)b2 + 1, (const char*)b2_end);
+    } else if (ok < 0) {
+        // error de sintaxis
+        println("Error: condición inválida\n", 24);
     }
-
-    // 5) Retornar posición tras el bloque procesado
-    return (b2_end ? b2_end : b1_end) + 1;
+    // 7) Saltar todo lo que venga hasta el final del else (si existe)
+    if (b2_end) return b2_end + 1;
+    return b1_end + 1;
 }
 
-// --- Implementación de ejecutar_bucle (puedes ponerla junto a ejecutar_condicional) ---
-static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end) {
-    // 1) Extraer condición igual que en ejecutar_condicional
-    const char *lp = strchr((const char*)p, '(');
-    const char *rp = lp ? strchr(lp, ')') : NULL;
-    if (!lp || !rp) return p;
 
-    char cond[64];
-    int clen = rp - lp - 1;
-    if (clen >= (int)sizeof(cond)) clen = sizeof(cond) - 1;
-    memcpy(cond, lp + 1, clen);
-    cond[clen] = '\0';
-
-    // Guardamos posición de inicio de bloque
-    const unsigned char *b = strchr((const char*)rp, '{');
-    if (!b) return p;
-    // Encontrar cierre correspondiente
-    int depth = 1;
-    const unsigned char *q = b + 1;
-    while (q < end && depth) {
-        if (*q == '{') depth++;
-        else if (*q == '}') depth--;
-        q++;
-    }
-    const unsigned char *b_start = b + 1;
-    const unsigned char *b_end   = q - 1;
-
-    // 2) Repetir interpretación del bloque mientras la condición sea cierta
-    while (1) {
-        // Re-evaluar condición
-        // (repite misma tokenización que en if)
-        char tmp[64];
-        strncpy(tmp, cond, sizeof(tmp));
-        char *tok_lhs = strtok(tmp, " <>!=\t");
-        char *tok_op  = strtok(NULL, "0123456789abcdefghijklmnopqrstuvwxyz_");
-        char *tok_rhs = strtok(NULL, " <>!=\t");
-        int lhs = eval_expr(&tok_lhs, /*argc=*/3, /*start=*/0);
-        int rhs = eval_expr(&tok_rhs, /*argc=*/3, /*start=*/0);
-        int ok  = evaluar_condicion(lhs, tok_op, rhs);
-        if (ok != 1) break;
-
-        // Ejecutar bloque
-        interpretar_bloque((const char*)b_start, (const char*)b_end);
-    }
-
-    // 3) Retornar puntero tras '}'
-    return b_end + 1;
-}
 
 

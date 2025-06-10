@@ -19,6 +19,9 @@ char *strpbrk(const char *s, const char *accept);
 /* Comparación de buffers con longitud explícita. */
 bool streq(char* string1, int str1len, char* string2, int str2len);
 char *strncpy(char *dst, const char *src, size_t n);
+char *strcpy(char *dest, const char *src);
+void *memmove(void *dest, const void *src, size_t n);
+
 
 #endif /* STDLIB_H */
 
