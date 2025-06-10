@@ -31,10 +31,11 @@ int live_command_ready = 0;  // bandera para ejecución
 static int   evaluar_condicion(int lhs, const char *op, int rhs);
 static void  interpretar_bloque(const char *start, const char *end);
 static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
-//static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
+static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
+static const unsigned char* ejecutar_loop(const unsigned char *p, const unsigned char *end);
 static int parse_int_or_var(const char *s);
 static int find_op(const char *cond, int *op_len);
-static int eval_condition(const char *cond_str); 
+static int eval_condition(const char *cond_str);
 
 
 #define MAX_VARS 32
@@ -454,6 +455,21 @@ void interpret_vgraph(const char *unused_path) {
                   line_start = p;
                   continue;
               }
+              if (line_len >= 4 && strncmp(start, "loop", 4) == 0 &&
+                  (start[4]==' '|| start[4]=='\t' || start[4]=='(')) {
+                  const unsigned char *newp = ejecutar_loop((unsigned char*)start, end);
+                  p = newp;
+                  line_start = p;
+                  continue;
+              }
+
+              if (line_len >= 5 && strncmp(start, "while", 5) == 0 &&
+                  (start[5]==' '||start[5]=='\t'||start[5]=='(')) {
+                  const unsigned char *newp = ejecutar_bucle((unsigned char*)start, end);
+                  p = newp;
+                  line_start = p;
+                  continue;
+              }
 
               // 3) Línea normal: copiar y ejecutar
               char buffer_line[80];
@@ -567,6 +583,113 @@ static const unsigned char* ejecutar_condicional(const unsigned char *p,
     // 7) Saltar todo lo que venga hasta el final del else (si existe)
     if (b2_end) return b2_end + 1;
     return b1_end + 1;
+}
+
+/**
+ * ejecutar_bucle: interpreta un bloque while(cond) { … }
+ *   p:   puntero al inicio de la línea, que debe comenzar con "while"
+ *   end: puntero al final de todo el script
+ * Retorna la posición justo después de la '}' que cierra el bloque.
+ */
+static const unsigned char* ejecutar_bucle(const unsigned char *p,
+                                           const unsigned char *end) {
+    // 1) Localizar paréntesis de la condición
+    const char *lpar = strchr((const char*)p, '(');
+    if (!lpar) return p;
+    const char *rpar = strchr(lpar, ')');
+    if (!rpar) return p;
+
+    // 2) Extraer la condición
+    int cond_len = (int)(rpar - lpar - 1);
+    if (cond_len > 63) cond_len = 63;
+    char cond[64];
+    strncpy(cond, lpar + 1, cond_len);
+    cond[cond_len] = '\0';
+
+    // 3) Encontrar inicio y fin del bloque { … }
+    const unsigned char *b = strchr((const char*)rpar, '{');
+    if (!b) return p;
+    int depth = 1;
+    const unsigned char *q = b + 1;
+    while (q < end && depth) {
+        if (*q == '{')      depth++;
+        else if (*q == '}') depth--;
+        q++;
+    }
+    const unsigned char *b_start = b + 1;
+    const unsigned char *b_end   = q - 1;
+
+    // 4) Ejecutar el bloque mientras la condición sea cierta
+    while (1) {
+        int ok = eval_condition(cond);
+        if (ok != 1) break;
+        interpretar_bloque((const char*)b_start, (const char*)b_end);
+    }
+
+    // 5) Devolver posición tras el '}'
+    return b_end + 1;
+}
+
+static const unsigned char* ejecutar_loop(const unsigned char *p,
+                                          const unsigned char *end) {
+    // 1) localizar paréntesis de control
+    const char *lpar = strchr((const char*)p, '(');
+    if (!lpar) return p;
+    const char *rpar = strchr(lpar, ')');
+    if (!rpar) return p;
+
+    // 2) extraer toda la parte "init; cond; incr"
+    int ctrl_len = (int)(rpar - lpar - 1);
+    if (ctrl_len > 255) ctrl_len = 255;
+    char ctrl[256];
+    strncpy(ctrl, lpar + 1, ctrl_len);
+    ctrl[ctrl_len] = '\0';
+
+    // 3) separar en 3 partes por ';'
+    char *parts[3] = { NULL, NULL, NULL };
+    int part = 0;
+    parts[part] = ctrl;
+    for (int i = 0; ctrl[i] && part < 2; i++) {
+        if (ctrl[i] == ';') {
+            ctrl[i] = '\0';
+            parts[++part] = ctrl + i + 1;
+        }
+    }
+    // trim en cada parte:
+    for (int i = 0; i < 3; i++) {
+        if (parts[i]) trim(parts[i]);
+    }
+
+    // 4) buscar inicio y fin del bloque { ... }
+    const unsigned char *b = strchr((const char*)rpar, '{');
+    if (!b) return p;
+    int depth = 1;
+    const unsigned char *q = b + 1;
+    while (q < end && depth) {
+        if (*q == '{') depth++;
+        else if (*q == '}') depth--;
+        q++;
+    }
+    const unsigned char *b_start = b + 1;
+    const unsigned char *b_end   = q - 1;
+
+    // 5) ejecutar init una sola vez
+    if (parts[0] && *parts[0]) {
+        ejecutar_una_linea(parts[0]);
+    }
+
+    // 6) bucle: eval cond, ejecutar cuerpo, ejecutar incr
+    while (1) {
+        int ok = eval_condition(parts[1]);
+        if (ok != 1) break;
+        interpretar_bloque((const char*)b_start, (const char*)b_end);
+        if (parts[2] && *parts[2]) {
+            ejecutar_una_linea(parts[2]);
+        }
+    }
+
+    // 7) retornar tras el cierre de '}'
+    return b_end + 1;
 }
 
 

@@ -1,11 +1,7 @@
-x = 100;
-y = 20;
-if (10 < 1) {
-	setcolor (red);
-	draw pixel (x,y);
-} 
-else {
-	setcolor (blue);
-	draw pixel (x,y);
+i = 0;
+loop (i = 0; i < 100; i = i + 10) {
+	setcolor (green);
+	draw circle (10, 100, i);
+	wait (5);
 }
 
