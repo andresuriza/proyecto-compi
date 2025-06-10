@@ -226,6 +226,9 @@ static int parsear_tokens(char *buffer, char *args[], int max) {
 // llama a la función correspondiente con los parámetros convertidos.
 // -----------------------------------------------------------------------------
 static void ejecutar_una_linea(const char *line) {
+    // Si es comentario, nada que hacer
+    while (*line == ' ' || *line == '\t') line++;
+    if (*line == '#' || *line == '\0') return;
     // Hacemos una copia de 'line' a un buffer local (mutable)
     char buffer[80];
     int len = 0;
@@ -444,6 +447,11 @@ void interpret_vgraph(const char *unused_path) {
               while (*start == ' ' || *start == '\t') {
                   start++;
                   line_len--;
+              }
+              if (*start == '#') {
+                // avanzamos al siguiente carácter tras '\n'
+                  line_start = p + 1;
+                  continue;
               }
               // 2) ¿Es un if?
               if (line_len >= 2 && strncmp(start, "if", 2) == 0 &&
