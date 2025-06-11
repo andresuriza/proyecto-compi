@@ -42,6 +42,7 @@ static double fmod_approx(double acc, double rhs);
 #define MAX_VARS 32
 #define MAX_NAME 16
 
+static char  var_types[MAX_VARS][MAX_NAME];
 static char  var_names[MAX_VARS][MAX_NAME];
 static int   var_values[MAX_VARS];
 static int   var_count = 0;
@@ -54,6 +55,30 @@ static double sin_approx(double x) {
 static double cos_approx(double x) {
     return sin_approx(PI/2 - x);
 }
+
+// --- new: parse color names into enum values ---
+static int parse_color(const char *s) {
+    if (strcmp(s, "black") == 0)          return COLOR_BLACK;
+    if (strcmp(s, "blue") == 0)           return COLOR_BLUE;
+    if (strcmp(s, "green") == 0)          return COLOR_GREEN;
+    if (strcmp(s, "cyan") == 0)           return COLOR_CYAN;
+    if (strcmp(s, "red") == 0)            return COLOR_RED;
+    if (strcmp(s, "magenta") == 0)        return COLOR_MAGENTA;
+    if (strcmp(s, "brown") == 0)          return COLOR_BROWN;
+    if (strcmp(s, "light_gray") == 0)     return COLOR_LIGHT_GRAY;
+    if (strcmp(s, "dark_gray") == 0)      return COLOR_DARK_GRAY;
+    if (strcmp(s, "light_blue") == 0)     return COLOR_LIGHT_BLUE;
+    if (strcmp(s, "light_green") == 0)    return COLOR_LIGHT_GREEN;
+    if (strcmp(s, "light_cyan") == 0)     return COLOR_LIGHT_CYAN;
+    if (strcmp(s, "light_red") == 0)      return COLOR_LIGHT_RED;
+    if (strcmp(s, "light_magenta") == 0)  return COLOR_LIGHT_MAGENTA;
+    if (strcmp(s, "yellow") == 0)         return COLOR_YELLOW;
+    if (strcmp(s, "white") == 0)          return COLOR_WHITE;
+    // default
+    return COLOR_WHITE;
+}
+
+
 
 
 /**
@@ -91,17 +116,19 @@ static int find_var(const char *name) {
 
 /** Crea o actualiza una variable */
 static void set_var(const char *name, int value) {
-    int idx = find_var(name);
-    if (idx >= 0) {
-        var_values[idx] = value;
-    } else if (var_count < MAX_VARS) {
-        strncpy(var_names[var_count], name, MAX_NAME-1);
-        var_names[var_count][MAX_NAME-1] = '\0';
-        var_values[var_count] = value;
-        var_count++;
-    } else {
-        print("Error: tabla de variables llena\n", 31);
-    }
+  int idx = find_var(name);
+  if (idx >= 0) {
+    var_values[idx] = value;
+  } else if (var_count < MAX_VARS) {
+      strncpy(var_types[var_count], "int", MAX_NAME);
+      strncpy(var_names[var_count], name, MAX_NAME-1);
+      var_names[var_count][MAX_NAME-1] = '\0';
+      var_values[var_count] = value;
+      var_values_dbl[var_count] = 0.0;
+      var_count++;
+  } else {
+      print("Error: tabla de variables llena\n", 31);
+  }
 }
 
 /** Devuelve el valor de la variable, o 0 si no existe */
@@ -244,6 +271,67 @@ static int parsear_tokens(char *buffer, char *args[], int max) {
 // llama a la función correspondiente con los parámetros convertidos.
 // -----------------------------------------------------------------------------
 static void ejecutar_una_linea(const char *line) {
+    if (*line == '(') {
+      // find closing ')'
+      const char *r = strchr(line, ')');
+      if (r) {
+        char typeName[MAX_NAME];
+        int tlen = r - line - 1;
+        if (tlen >= MAX_NAME) tlen = MAX_NAME-1;
+          strncpy(typeName, line+1, tlen);
+          typeName[tlen] = '\0';
+          // rest of declaration
+          const char *rest = r + 1;
+          // split by commas
+          char buf[80]; strncpy(buf, rest, sizeof(buf)-1); buf[sizeof(buf)-1]='\0';
+          // remove trailing ';'
+          char *semi = strchr(buf, ';'); if (semi) *semi='\0';
+          // tokenize by ','
+          char *tok = strtok(buf, ",");
+          while (tok) {
+            // trim
+            trim(tok);
+            // check for initialization
+            char *eq = strchr(tok, '=');
+            if (eq) {
+              *eq = '\0';
+              char *name = tok;
+              trim(name);
+              char *val_s = eq + 1;
+              trim(val_s);
+              // parse value
+              int idx = var_count;
+              if (idx >= MAX_VARS) break;
+                // store type and name
+                strncpy(var_types[idx], typeName, MAX_NAME);
+                strncpy(var_names[idx], name, MAX_NAME);
+                // parse based on type
+                if (strcmp(typeName, "double")==0) {
+                  var_values_dbl[idx] = atof(val_s);
+                } else if (strcmp(typeName, "color")==0) {
+                  // map color names to enums
+                  var_values[idx] = parse_color(val_s);
+                } else { // int default
+                  var_values[idx] = atoi(val_s);
+                }
+                var_count++;
+                } else {
+                  // declaration without init
+                  int idx = var_count;
+                  if (idx >= MAX_VARS) break;
+                    trim(tok);
+                    strncpy(var_types[idx], typeName, MAX_NAME);
+                    strncpy(var_names[idx], tok, MAX_NAME);
+                    // defaults: zero
+                    var_values[idx] = 0;
+                    var_values_dbl[idx] = 0.0;
+                    var_count++;
+                }
+                tok = strtok(NULL, ",");
+            }
+        }
+        return;
+    }
     // Si es comentario, nada que hacer
     while (*line == ' ' || *line == '\t') line++;
     if (*line == '#' || *line == '\0') return;
@@ -378,32 +466,44 @@ static void ejecutar_una_linea(const char *line) {
     if (strcmp(cmd, "setcolor") == 0) {
       if (argc == 2) {
         unsigned char col;
-        if (strcmp(args[1], "black") == 0)          col = COLOR_BLACK;
-        else if (strcmp(args[1], "blue") == 0)      col = COLOR_BLUE;
-        else if (strcmp(args[1], "green") == 0)     col = COLOR_GREEN;
-        else if (strcmp(args[1], "cyan") == 0)      col = COLOR_CYAN;
-        else if (strcmp(args[1], "red") == 0)       col = COLOR_RED;
-        else if (strcmp(args[1], "magenta") == 0)   col = COLOR_MAGENTA;
-        else if (strcmp(args[1], "brown") == 0)     col = COLOR_BROWN;
-        else if (strcmp(args[1], "light_gray") == 0)  col = COLOR_LIGHT_GRAY;
-        else if (strcmp(args[1], "dark_gray") == 0)   col = COLOR_DARK_GRAY;
-        else if (strcmp(args[1], "light_blue") == 0)  col = COLOR_LIGHT_BLUE;
-        else if (strcmp(args[1], "light_green") == 0) col = COLOR_LIGHT_GREEN;
-        else if (strcmp(args[1], "light_cyan") == 0)  col = COLOR_LIGHT_CYAN;
-        else if (strcmp(args[1], "light_red") == 0)   col = COLOR_LIGHT_RED;
-        else if (strcmp(args[1], "light_magenta") == 0) col = COLOR_LIGHT_MAGENTA;
-        else if (strcmp(args[1], "yellow") == 0)      col = COLOR_YELLOW;
-        else if (strcmp(args[1], "white") == 0)       col = COLOR_WHITE;
-        else {
-            println("Error: color desconocido\n", 24);
-            return;
+        const char *arg = args[1];
+        // 1) literal color names
+        int found = 0;
+        const struct { const char *name; unsigned char val; } cmap[] = {
+          {"black", COLOR_BLACK}, {"blue", COLOR_BLUE}, {"green", COLOR_GREEN},
+          {"cyan", COLOR_CYAN}, {"red", COLOR_RED}, {"magenta", COLOR_MAGENTA},
+          {"brown", COLOR_BROWN}, {"light_gray", COLOR_LIGHT_GRAY}, {"dark_gray", COLOR_DARK_GRAY},
+          {"light_blue", COLOR_LIGHT_BLUE}, {"light_green", COLOR_LIGHT_GREEN},
+          {"light_cyan", COLOR_LIGHT_CYAN}, {"light_red", COLOR_LIGHT_RED},
+          {"light_magenta", COLOR_LIGHT_MAGENTA}, {"yellow", COLOR_YELLOW},
+          {"white", COLOR_WHITE}
+        };
+        for (int i = 0; i < (int)(sizeof(cmap)/sizeof(cmap[0])); ++i) {
+          if (strcmp(arg, cmap[i].name) == 0) {
+            col = cmap[i].val;
+            found = 1;
+            break;
+          }
         }
-
+        // 2) variable holding a color
+        if (!found) {
+          int idx = find_var(arg);
+          if (idx >= 0 && strcmp(var_types[idx], "color") == 0) {
+            col = var_values[idx];
+            found = 1;
+          }
+        }
+        if (!found) {
+          println("Error: color desconocido\n", 24);
+          return;
+        }
+         
         set_color(col);
-    } else {
-        println("Error: set_color requiere 1 parámetro\n", 38);
-    }
-    return;
+        return;
+      } else {
+        println("Error: setcolor requiere 1 parámetro\n", 38);
+        return;
+      }
     }
     
     if (strcmp(cmd, "wait") == 0) {

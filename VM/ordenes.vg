@@ -1,11 +1,8 @@
-x = 200; # asignación de x = 100
-y = 100;
-i = 0; # asignación de i = 1
-frame {
-	loop (i = 0; i < 100; i = i + 10) {
-	setcolor (green);
-	draw circle (10, 100, i); # pinta círculo dinámicamente
-	wait (5);
-	}
-}
+(int) x, y;
+x = 100;
+y = 150;
+(color) c = green;
+
+setcolor (blue);
+draw pixel (x,y);
 
