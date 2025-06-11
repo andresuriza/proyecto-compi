@@ -1,8 +1,8 @@
 (int) x, y;
 x = 100;
 y = 150;
-(color) c = green;
+(color) c = verde;
 
-setcolor (blue);
+setcolor (azul);
 draw pixel (x,y);
 

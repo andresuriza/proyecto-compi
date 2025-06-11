@@ -63,23 +63,23 @@ static double fmod_approx(double acc, double rhs) {
 
 // --- new: parse color names into enum values ---
 static int parse_color(const char *s) {
-    if (strcmp(s, "black") == 0)          return COLOR_BLACK;
-    if (strcmp(s, "blue") == 0)           return COLOR_BLUE;
-    if (strcmp(s, "green") == 0)          return COLOR_GREEN;
-    if (strcmp(s, "cyan") == 0)           return COLOR_CYAN;
-    if (strcmp(s, "red") == 0)            return COLOR_RED;
-    if (strcmp(s, "magenta") == 0)        return COLOR_MAGENTA;
-    if (strcmp(s, "brown") == 0)          return COLOR_BROWN;
-    if (strcmp(s, "light_gray") == 0)     return COLOR_LIGHT_GRAY;
-    if (strcmp(s, "dark_gray") == 0)      return COLOR_DARK_GRAY;
-    if (strcmp(s, "light_blue") == 0)     return COLOR_LIGHT_BLUE;
-    if (strcmp(s, "light_green") == 0)    return COLOR_LIGHT_GREEN;
-    if (strcmp(s, "light_cyan") == 0)     return COLOR_LIGHT_CYAN;
-    if (strcmp(s, "light_red") == 0)      return COLOR_LIGHT_RED;
-    if (strcmp(s, "light_magenta") == 0)  return COLOR_LIGHT_MAGENTA;
-    if (strcmp(s, "yellow") == 0)         return COLOR_YELLOW;
-    if (strcmp(s, "white") == 0)          return COLOR_WHITE;
-    // default
+    if (strcmp(s, "negro") == 0)             return COLOR_BLACK;
+    if (strcmp(s, "azul") == 0)              return COLOR_BLUE;
+    if (strcmp(s, "verde") == 0)             return COLOR_GREEN;
+    if (strcmp(s, "cyan") == 0)              return COLOR_CYAN;
+    if (strcmp(s, "rojo") == 0)              return COLOR_RED;
+    if (strcmp(s, "magenta") == 0)           return COLOR_MAGENTA;
+    if (strcmp(s, "marron") == 0)            return COLOR_BROWN;
+    if (strcmp(s, "gris_claro") == 0)        return COLOR_LIGHT_GRAY;
+    if (strcmp(s, "gris_oscuro") == 0)       return COLOR_DARK_GRAY;
+    if (strcmp(s, "azul_claro") == 0)        return COLOR_LIGHT_BLUE;
+    if (strcmp(s, "verde_claro") == 0)       return COLOR_LIGHT_GREEN;
+    if (strcmp(s, "cyan_claro") == 0)        return COLOR_LIGHT_CYAN;
+    if (strcmp(s, "rojo_claro") == 0)        return COLOR_LIGHT_RED;
+    if (strcmp(s, "magenta_claro") == 0)     return COLOR_LIGHT_MAGENTA;
+    if (strcmp(s, "amarillo") == 0)          return COLOR_YELLOW;
+    if (strcmp(s, "blanco") == 0)            return COLOR_WHITE;
+    // por defecto
     return COLOR_WHITE;
 }
 
@@ -491,14 +491,14 @@ static void ejecutar_una_linea(const char *line) {
         const char *arg = args[1];
         // 1) literal color names
         int found = 0;
-        const struct { const char *name; unsigned char val; } cmap[] = {
-          {"black", COLOR_BLACK}, {"blue", COLOR_BLUE}, {"green", COLOR_GREEN},
-          {"cyan", COLOR_CYAN}, {"red", COLOR_RED}, {"magenta", COLOR_MAGENTA},
-          {"brown", COLOR_BROWN}, {"light_gray", COLOR_LIGHT_GRAY}, {"dark_gray", COLOR_DARK_GRAY},
-          {"light_blue", COLOR_LIGHT_BLUE}, {"light_green", COLOR_LIGHT_GREEN},
-          {"light_cyan", COLOR_LIGHT_CYAN}, {"light_red", COLOR_LIGHT_RED},
-          {"light_magenta", COLOR_LIGHT_MAGENTA}, {"yellow", COLOR_YELLOW},
-          {"white", COLOR_WHITE}
+        static const struct { const char *name; unsigned char val; } cmap[] = {
+            {"negro", COLOR_BLACK}, {"azul", COLOR_BLUE}, {"verde", COLOR_GREEN},
+            {"cyan", COLOR_CYAN}, {"rojo", COLOR_RED}, {"magenta", COLOR_MAGENTA},
+            {"marron", COLOR_BROWN}, {"gris_claro", COLOR_LIGHT_GRAY}, {"gris_oscuro", COLOR_DARK_GRAY},
+            {"azul_claro", COLOR_LIGHT_BLUE}, {"verde_claro", COLOR_LIGHT_GREEN},
+            {"cyan_claro", COLOR_LIGHT_CYAN}, {"rojo_claro", COLOR_LIGHT_RED},
+            {"magenta_claro", COLOR_LIGHT_MAGENTA}, {"amarillo", COLOR_YELLOW},
+            {"blanco", COLOR_WHITE}
         };
         for (int i = 0; i < (int)(sizeof(cmap)/sizeof(cmap[0])); ++i) {
           if (strcmp(arg, cmap[i].name) == 0) {
