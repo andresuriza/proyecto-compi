@@ -18,7 +18,7 @@ int ex(nodeType *p);
 int yylex(void);
 //void addPredefinedConstants();
 
-void yyerror(char *s);
+void yyerror(const char *s);
 %}
 
 // TODO chequear longitud de identifier
@@ -67,77 +67,83 @@ void yyerror(char *s);
 %token PRINT
 %token INT FLOAT COLOR C_DECL I_DECL
 
-%type <nPtr> stmt expr stmt_list frame conditional_body conditional condition assignment var_type
+%type <nPtr> stmt expr stmt_list frame conditional_body conditional assignment var_type
 %type <nPtr> int_list color_list
 
 %%
 
 program:
-        function { exit(0); }
+        function 
+        | error { fprintf(stderr, "Error de sintaxis en la estructura 'program'\n"); yyerrok; }
         ;
 
 function:
           function stmt { ex($2); freeNode($2); }
         | function frame { ex($2); freeNode($2); }
         | /* NULL */
+        | error { fprintf(stderr, "Error en 'function'\n"); yyerrok; }
         ;
 
 frame:
           FRAME '{' stmt_list '}' { $$ = $3; }
+        | error { fprintf(stderr, "Error en definición de 'frame'\n"); yyerrok; $$ = NULL; }
         ;
-
 
 stmt:
           ';'   { $$ = opr(';', 2, NULL, NULL); }
         | var_type ';' { $$ = $1; }
         | expr ';'  { $$ = $1; }
         | assignment ';'  { $$ = $1; }
-        | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { 
-                $$ = opr(LOOP, 4, $3, $5, $7, $9); 
-            }
-        | IF '(' conditional ')' conditional_body %prec IFX    { $$ = opr(IF, 2, $3, $5); }
-        | IF '(' conditional ')' conditional_body ELSE conditional_body  { $$ = opr(IF, 3, $3, $5, $7); }
+        | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { $$ = opr(LOOP, 4, $3, $5, $7, $9); }
+        | IF '(' conditional ')' conditional_body %prec IFX { $$ = opr(IF, 2, $3, $5); }
+        | IF '(' conditional ')' conditional_body ELSE conditional_body { $$ = opr(IF, 3, $3, $5, $7); }
         | SETCOLOR '(' expr ')' ';'  { $$ = opr(SETCOLOR, 1, $3); }
         | WAIT '(' expr ')' ';'  { $$ = opr(WAIT, 1, $3); }
         | DRAW PIXEL '(' expr ',' expr ')' ';'  { $$ = opr(PIXEL, 2, $4, $6); }
-        | DRAW TREE '(' expr ',' expr ',' expr ',' expr ',' expr ')' ';'  { 
-                $$ = opr(TREE, 2, $4, $6, $8, $10, $12); 
-            }
-        //| '{' stmt_list '}' { $$ = $2; }
+        | DRAW TREE '(' expr ',' expr ',' expr ',' expr ',' expr ')' ';'  { $$ = opr(TREE, 2, $4, $6, $8, $10, $12); }
+        | error ';' { fprintf(stderr, "Error en sentencia\n"); yyerrok; $$ = NULL; }
         ;
 
 var_type:
           '(' INT ')' int_list { $$ = $4; }
-        |  '(' COLOR ')' color_list { $$ = $4; }
+        | '(' COLOR ')' color_list { $$ = $4; }
+        | error { fprintf(stderr, "Error en declaración de tipo\n"); yyerrok; $$ = NULL; }
         ;
 
 int_list:
         VARIABLE { $$ = opr(I_DECL, 2, id($1), con(0)); }
-        | int_list ',' VARIABLE { $$ = opr(I_DECL, 2, id($3), con(0)); }
+        | int_list ',' VARIABLE { $$ = opr(';', 2, $1, opr(I_DECL, 2, id($3), con(0))); }
+        | error { fprintf(stderr, "Error en lista de enteros\n"); yyerrok; $$ = NULL; }
         ;
+
 
 color_list:
         VARIABLE { $$ = opr(C_DECL, 2, id($1), conColor("rojo")); }
-        | color_list ',' VARIABLE { $$ = opr(C_DECL, 2, id($3), conColor("rojo")); }
+        | color_list ',' VARIABLE { $$ = opr(';', 2, $1, opr(C_DECL, 2, id($3), conColor("rojo"))); }
+        | error { fprintf(stderr, "Error en lista de colores\n"); yyerrok; $$ = NULL; }
         ;
+
 
 assignment:
            VARIABLE '=' expr { $$ = opr('=', 2, id($1), $3); }
-          ;
+         | error { fprintf(stderr, "Error en asignación\n"); yyerrok; $$ = NULL; }
+         ;
 
 conditional_body:
           '{' stmt_list '}' { $$ = $2; }
-          | stmt_list { $$ = $1; }
+        | stmt_list { $$ = $1; }
+        | error { fprintf(stderr, "Error en cuerpo condicional\n"); yyerrok; $$ = NULL; }
         ;
 
 stmt_list:
-          stmt                  { $$ = $1; }
-        | stmt_list stmt        { $$ = opr(';', 2, $1, $2); }
+          stmt { $$ = $1; }
+        | stmt_list stmt { $$ = opr(';', 2, $1, $2); }
+        | error { fprintf(stderr, "Error en lista de sentencias\n"); yyerrok; $$ = NULL; }
         ;
 
 expr:
           INTEGER               { $$ = con($1); }
-        | COLORTYPE              { $$ = conColor($1); }
+        | COLORTYPE            { $$ = conColor($1); }
         | VARIABLE              { $$ = id($1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
@@ -148,20 +154,19 @@ expr:
         | COS '(' expr ')'      { $$ = opr(COS, 1, $3); }
         | SIN '(' expr ')'      { $$ = opr(SIN, 1, $3); }
         | '(' expr ')'          { $$ = $2; }
+        | error { fprintf(stderr, "Error en expresión\n"); yyerrok; $$ = NULL; }
         ;
 
 conditional:
            expr '<' expr         { $$ = opr('<', 2, $1, $3); }
          | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
-         | expr '>''=' expr         { $$ = opr(GE, 2, $1, $4); }
-         | expr '<''=' expr         { $$ = opr(LE, 2, $1, $4); }
-         | expr '=''=' expr         { $$ = opr(EQ, 2, $1, $4); }
-         | expr '!''=' expr         { $$ = opr(NE, 2, $1, $4); }
+         | expr '>''=' expr      { $$ = opr(GE, 2, $1, $4); }
+         | expr '<''=' expr      { $$ = opr(LE, 2, $1, $4); }
+         | expr '=''=' expr      { $$ = opr(EQ, 2, $1, $4); }
+         | expr '!''=' expr      { $$ = opr(NE, 2, $1, $4); }
+         | error { fprintf(stderr, "Error en condición lógica\n"); yyerrok; $$ = NULL; }
          ;
 
-condition:
-           '(' assignment ';' conditional ';'  assignment ')' { $$ = $4; }
-         ;
 
 %%
 
@@ -249,9 +254,14 @@ void freeNode(nodeType *p) {
     free (p);
 }
 
-void yyerror(char *s) {
-    fprintf(stdout, "%s\n", s);
+void yyerror(const char *s) {
+    extern int yylineno;
+    extern char *yytext;
+    fprintf(stderr, "Error de sintaxis en línea %d cerca de '%s': %s\n", yylineno, yytext, s);
+    exit(1);  // Detiene inmediatamente
 }
+
+
 
 int main(void) {
     //addPredefinedConstants();

@@ -9,8 +9,22 @@ void yyerror (char *);
 
 "draw" { return DRAW; }
 "rojo" { yylval.id = strdup(yytext); return COLORTYPE; }
+"rojon" { yylval.id = strdup(yytext); return COLORTYPE; }
 "verde" { yylval.id = strdup(yytext); return COLORTYPE; }
+"verdon" { yylval.id = strdup(yytext); return COLORTYPE; }
 "azul" { yylval.id = strdup(yytext); return COLORTYPE; }
+"azulon" { yylval.id = strdup(yytext); return COLORTYPE; }
+"negro" { yylval.id = strdup(yytext); return COLORTYPE; }
+"cian" { yylval.id = strdup(yytext); return COLORTYPE; }
+"cianon" { yylval.id = strdup(yytext); return COLORTYPE; }
+"magenta" { yylval.id = strdup(yytext); return COLORTYPE; }
+"magenton" { yylval.id = strdup(yytext); return COLORTYPE; }
+"cafe" { yylval.id = strdup(yytext); return COLORTYPE; }
+"gris" { yylval.id = strdup(yytext); return COLORTYPE; }
+"grison" { yylval.id = strdup(yytext); return COLORTYPE; }
+"amarillo" { yylval.id = strdup(yytext); return COLORTYPE; }
+"blanco" { yylval.id = strdup(yytext); return COLORTYPE; }
+
 "setcolor" { return SETCOLOR; }
 "frame" { return FRAME; }
 "loop" { return LOOP; }
