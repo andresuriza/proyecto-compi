@@ -33,10 +33,11 @@ static void  interpretar_bloque(const char *start, const char *end);
 static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
 static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
 static const unsigned char* ejecutar_loop(const unsigned char *p, const unsigned char *end);
-static int parse_int_or_var(const char *s);
+static const unsigned char* ejecutar_frame(const unsigned char *p, const unsigned char *end);
+static double parse_number_or_var(const char *s);
 static int find_op(const char *cond, int *op_len);
 static int eval_condition(const char *cond_str);
-
+static double fmod_approx(double acc, double rhs);
 
 #define MAX_VARS 32
 #define MAX_NAME 16
@@ -44,25 +45,34 @@ static int eval_condition(const char *cond_str);
 static char  var_names[MAX_VARS][MAX_NAME];
 static int   var_values[MAX_VARS];
 static int   var_count = 0;
+static double var_values_dbl[MAX_VARS];
 
-
-
+static double sin_approx(double x) {
+    double x2 = x*x;
+    return x - x*x2/6.0 + x2*x2/120.0 - x2*x2*x2/5040.0;
+}
+static double cos_approx(double x) {
+    return sin_approx(PI/2 - x);
+}
 
 
 /**
  * eval_expr: evalúa una expresión simple de suma/resta cuyos tokens
  * están en args[start..argc-1]. Retorna el resultado como int.
  */
-static int eval_expr(char *args[], int argc, int start) {
+static double eval_expr(char *args[], int argc, int start) {
     // 1) Valor inicial
-    int acc = parse_int_or_var(args[start]);
+    double acc = parse_number_or_var(args[start]);
 
     // 2) Recorremos pares (op, operando)
     for (int i = start + 1; i + 1 < argc; i += 2) {
         char *op  = args[i];
-        int   rhs = parse_int_or_var(args[i+1]);
+        double rhs = parse_number_or_var(args[i+1]);
         if      (strcmp(op, "+") == 0) acc += rhs;
         else if (strcmp(op, "-") == 0) acc -= rhs;
+        else if (strcmp(op, "*") == 0) acc *= rhs;
+        else if (strcmp(op, "/") == 0) acc /= rhs;
+        else if (strcmp(op, "%") == 0) acc = fmod_approx(acc, rhs);
         else {
             print("Error: operador desconocido en expr\n", 33);
         }
@@ -95,15 +105,23 @@ static void set_var(const char *name, int value) {
 }
 
 /** Devuelve el valor de la variable, o 0 si no existe */
-static int get_var(const char *name) {
+static double get_var(const char *name) {
     int idx = find_var(name);
     return (idx >= 0) ? var_values[idx] : 0;
 }
 
-static int parse_int_or_var(const char *s) {
+static double parse_number_or_var(const char *s) {
+    if (strncmp(s, "sin(", 4) == 0) {
+        double v = atof(s + 4);  // convierte lo que venga después
+        return sin_approx(v);
+    }
+    if (strncmp(s, "cos(", 4) == 0) {
+        double v = atof(s + 4);
+        return cos_approx(v);
+    }
     // Detectar número (primer carácter dígito o signo+digito)
     if ((s[0] >= '0' && s[0] <= '9') ||
-        ((s[0] == '-' || s[0] == '+') && (s[1] >= '0' && s[1] <= '9'))) {
+        ((s[0] == '-' || s[0] == '+'|| s[0] == '*' || s[0] == '/' || s[0] == '%') && (s[1] >= '0' && s[1] <= '9'))) {
         return atoi(s);
     }
     return get_var(s);
@@ -267,8 +285,8 @@ static void ejecutar_una_linea(const char *line) {
     if (strcmp(cmd, "draw") == 0) {
         if(strcmp(cmd2,"pixel") == 0){
           if (argc == 4) {
-            int x            = parse_int_or_var(args[2]);
-            int y            = parse_int_or_var(args[3]);
+            double x            = parse_number_or_var(args[2]);
+            double y            = parse_number_or_var(args[3]);
             draw_pixel(x,y);
           } else {
             println("Error: draw_pixel requiere 2 parámetros\n", 40);
@@ -277,10 +295,10 @@ static void ejecutar_una_linea(const char *line) {
         }
         if (strcmp(cmd2, "line") == 0) {
           if (argc == 6) {
-              int x0            = parse_int_or_var(args[2]);
-              int y0            = parse_int_or_var(args[3]);
-              int x1            = parse_int_or_var(args[4]);
-              int y1            = parse_int_or_var(args[5]);
+              double x0            = parse_number_or_var(args[2]);
+              double y0            = parse_number_or_var(args[3]);
+              double x1            = parse_number_or_var(args[4]);
+              double y1            = parse_number_or_var(args[5]);
               draw_line(x0,y0,x1,y1);
           } else {
               println("Error: draw_line requiere 4 parámetros\n", 40);
@@ -289,10 +307,10 @@ static void ejecutar_una_linea(const char *line) {
        }
       if (strcmp(cmd2, "rect") == 0) {
         if (argc == 6) {
-            int x            = parse_int_or_var(args[2]);
-            int y            = parse_int_or_var(args[3]);
-            int width           = parse_int_or_var(args[4]);
-            int height            = parse_int_or_var(args[5]);
+            double x            = parse_number_or_var(args[2]);
+            double y            = parse_number_or_var(args[3]);
+            double width           = parse_number_or_var(args[4]);
+            double height            = parse_number_or_var(args[5]);
             draw_rect(x,y,width,height);
         } else {
             println("Error: draw_rect requiere 4 parámetros\n", 40);
@@ -301,9 +319,9 @@ static void ejecutar_una_linea(const char *line) {
       }
       if (strcmp(cmd2, "circle") == 0) {
         if (argc == 5) {
-          int xc           = parse_int_or_var(args[2]);
-          int yc            = parse_int_or_var(args[3]);
-          int r           = parse_int_or_var(args[4]);
+          double xc           = parse_number_or_var(args[2]);
+          double yc            = parse_number_or_var(args[3]);
+          double r           = parse_number_or_var(args[4]);
           draw_circle(xc,yc,r);
         } else {
             println("Error: draw_circle requiere 3 parámetros\n", 40);
@@ -314,11 +332,11 @@ static void ejecutar_una_linea(const char *line) {
     if(strcmp(cmd, "animate") == 0) {
       if (strcmp(cmd2, "tree") == 0) {
           if (argc == 7) {
-              int x      = parse_int_or_var(args[2]);
-              int y      = parse_int_or_var(args[3]);
+              double x      = parse_number_or_var(args[2]);
+              double y      = parse_number_or_var(args[3]);
               double len = atof(args[4]);
               double ang = atof(args[5]);
-              int depth  = parse_int_or_var(args[6]);
+              double depth  = parse_number_or_var(args[6]);
               animate_tree(x, y, len, ang, depth);
           } else {
               println("Error: animate_tree requiere 5 parámetros\n", 37);
@@ -332,8 +350,8 @@ static void ejecutar_una_linea(const char *line) {
       // ================================================================
       if (strcmp(cmd2, "mandala") == 0) {
           if (argc == 4) {
-              int cx     = parse_int_or_var(args[2]);
-              int cy     = parse_int_or_var(args[3]);
+              double cx     = parse_number_or_var(args[2]);
+              double cy     = parse_number_or_var(args[3]);
               animate_mandala(cx, cy);
           } else {
               println("Error: animate_mandala requiere 2 parámetros\n", 40);
@@ -347,9 +365,9 @@ static void ejecutar_una_linea(const char *line) {
       // ================================================================
       if (strcmp(cmd2, "spiral") == 0) {
           if (argc == 5) {
-              int cx            = parse_int_or_var(args[2]);
-              int cy            = parse_int_or_var(args[3]);
-              int r          = parse_int_or_var(args[4]);
+              double cx            = parse_number_or_var(args[2]);
+              double cy            = parse_number_or_var(args[3]);
+              double r          = parse_number_or_var(args[4]);
               animate_spiral(cx, cy, r);
           } else {
               println("Error: animate_spiral requiere 3 parámetros\n", 40);
@@ -390,7 +408,7 @@ static void ejecutar_una_linea(const char *line) {
     
     if (strcmp(cmd, "wait") == 0) {
         if (argc == 2) {
-            int s           = parse_int_or_var(args[1]);
+            double s           = parse_number_or_var(args[1]);
             wait(s);
         } else {
             println("Error: wait requiere 1 parámetros\n", 40);
@@ -451,6 +469,13 @@ void interpret_vgraph(const char *unused_path) {
               if (*start == '#') {
                 // avanzamos al siguiente carácter tras '\n'
                   line_start = p + 1;
+                  continue;
+              }
+              if (line_len >= 5 && strncmp(start, "frame", 5) == 0 &&
+                  (start[5]==' '||start[5]=='\t'||start[5]=='{')) {
+                  const unsigned char *newp = ejecutar_frame((unsigned char*)start, end);
+                  p = newp;
+                  line_start = p;
                   continue;
               }
               // 2) ¿Es un if?
@@ -525,6 +550,65 @@ static void interpretar_bloque(const char *start, const char *end) {
 }
 
 
+static const unsigned char* ejecutar_frame(const unsigned char *p, const unsigned char *end) {
+    // Encontrar '{' del frame
+    const unsigned char *b = strchr((const char*)p, '{');
+    if (!b || b >= end) return p;
+    int depth = 1;
+    const unsigned char *q = b + 1;
+    while (q < end && depth) {
+        if (*q == '{') depth++;
+        else if (*q == '}') depth--;
+        q++;
+    }
+    const unsigned char *b_start = b + 1;
+    const unsigned char *b_end   = q - 1;
+
+    // Ejecutar dinámicamente el bloque: manejar if/loop/while/frame internos
+    const unsigned char *line_p = b_start;
+    while (line_p < b_end) {
+        // Encontrar fin de línea
+        const unsigned char *line_end = line_p;
+        while (line_end < b_end && *line_end != '\n') line_end++;
+        int line_len = (int)(line_end - line_p);
+        if (line_len > 0 && line_len < 80) {
+            char *start = (char*)line_p;
+            while (*start == ' ' || *start == '\t') { start++; line_len--; }
+            if (*start != '#') {
+                if (line_len >= 5 && strncmp(start, "frame", 5) == 0 &&
+                    (start[5]==' '||start[5]=='\t'||start[5]=='{')) {
+                    line_p = ejecutar_frame((unsigned char*)start, b_end);
+                    continue;
+                } else if (line_len >= 2 && strncmp(start, "if", 2) == 0 &&
+                           (start[2]==' '||start[2]=='\t'||start[2]=='(')) {
+                    line_p = ejecutar_condicional((unsigned char*)start, b_end);
+                    continue;
+                } else if (line_len >= 4 && strncmp(start, "loop", 4) == 0 &&
+                           (start[4]==' '||start[4]=='\t'||start[4]=='(')) {
+                    line_p = ejecutar_loop((unsigned char*)start, b_end);
+                    continue;
+                } else if (line_len >= 5 && strncmp(start, "while", 5) == 0 &&
+                           (start[5]==' '||start[5]=='\t'||start[5]=='(')) {
+                    line_p = ejecutar_bucle((unsigned char*)start, b_end);
+                    continue;
+                } else {
+                    // Línea normal
+                    char buf[80];
+                    memcpy(buf, start, line_len);
+                    buf[line_len] = '\0';
+                    ejecutar_una_linea(buf);
+                }
+            }
+        }
+        // Avanzar a la siguiente línea
+        line_p = (line_end < b_end ? line_end + 1 : b_end);
+    }
+
+    return b_end + 1;
+}
+
+
+
 static const unsigned char* ejecutar_condicional(const unsigned char *p,
                                                 const unsigned char *end) {
     // 1) Localizar paréntesis de la condición
@@ -555,14 +639,21 @@ static const unsigned char* ejecutar_condicional(const unsigned char *p,
     }
     const unsigned char *b1_end = q - 1;
 
-    // 5) Intentar localizar bloque else { … } (si existe)
-    const unsigned char *b2 = NULL, *b2_end = NULL;
+    // 5) Buscar 'else' o 'else if'
     const unsigned char *scan = b1_end + 1;
-    // avanzar espacios y saltos de línea
+    // Saltar espacios y saltos de línea
     while (scan < end && (*scan==' '||*scan=='\t'||*scan=='\r'||*scan=='\n'))
         scan++;
-    // solo si viene "else" y a continuación '{'
-    if (scan + 4 < end && strncmp((const char*)scan, "else", 4)==0) {
+
+    // Manejo de 'else if'
+    if (scan + 7 < end && strncmp((const char*)scan, "else if", 7) == 0) {
+        // Llamar recursivamente para manejar 'else if'
+        return ejecutar_condicional(scan + 4, end);
+    }
+
+    // Manejo de 'else'
+    const unsigned char *b2 = NULL, *b2_end = NULL;
+    if (scan + 4 < end && strncmp((const char*)scan, "else", 4) == 0) {
         const unsigned char *eb = strchr((const char*)scan+4, '{');
         if (eb) {
             depth = 1;
@@ -588,6 +679,7 @@ static const unsigned char* ejecutar_condicional(const unsigned char *p,
         // error de sintaxis
         println("Error: condición inválida\n", 24);
     }
+
     // 7) Saltar todo lo que venga hasta el final del else (si existe)
     if (b2_end) return b2_end + 1;
     return b1_end + 1;
@@ -700,6 +792,9 @@ static const unsigned char* ejecutar_loop(const unsigned char *p,
     return b_end + 1;
 }
 
-
+static double fmod_approx(double acc, double rhs) {
+    int n = (int)(acc / rhs);   // truncamiento = floor para positivos
+    return acc - n * rhs;
+}
 
 

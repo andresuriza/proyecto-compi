@@ -14,7 +14,8 @@ static void interpretar_bloque(const char *start, const char *end);
 static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
 static const unsigned char* ejecutar_bucle(const unsigned char *p, const unsigned char *end);
 static const unsigned char* ejecutar_loop(const unsigned char *p, const unsigned char *end);
-static int parse_int_or_var(const char *s);
+static const unsigned char* ejecutar_frame(const unsigned char *p, const unsigned char *end);
+static double parse_number_or_var(const char *s);
 
 
 #endif

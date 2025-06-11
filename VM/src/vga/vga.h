@@ -2,7 +2,7 @@
 #define __VGA_H
 
 #define VGA_ADDRESS 0xA0000
-
+#define PI 3.14159265358979323846
 
 void vga_clear_screen();
 
@@ -42,7 +42,10 @@ void wait_ms(int ms);
 void animate_spiral(int cx, int cy, int radius_max);
 void draw_spiral_frame(int cx, int cy, int t_max);
 void wait(int s);
+int cos_deg(int deg);
 
+static double sin_approx(double x);
+static double cos_approx(double x);
 // end copied code
 
 #endif
