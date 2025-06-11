@@ -358,9 +358,16 @@ static void ejecutar_una_linea(const char *line) {
     char *cmd2 = args[1];
     // ——— Asignación simple: var = expr
     if (argc >= 3 && strcmp(args[1], "=") == 0) {
-      // args[2..argc-1] contienen la expresión entera
-      int val = eval_expr(args, argc, 2);
-      set_var(args[0], val);
+      int idx = find_var(args[0]);
+      if (idx >= 0 && strcmp(var_types[idx], "color") == 0) {
+      // Si la variable es de tipo color, interpretamos el RHS como nombre de color
+        int col = parse_color(args[2]);
+        var_values[idx] = col;
+      } else {
+        // Asignación numérica habitual
+        int val = eval_expr(args, argc, 2);
+        set_var(args[0], val);
+      }
       return;
     }
 
