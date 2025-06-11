@@ -27,7 +27,7 @@ extern const unsigned char _binary_ordenes_vg_end[];
 // src/input/interpreter.c o kernel.c
 char vgraph_live_buffer[256] = {0};
 int live_command_ready = 0;  // bandera para ejecución
-
+static int parsear_tokens(char *buffer, char *args[], int max);
 static int   evaluar_condicion(int lhs, const char *op, int rhs);
 static void  interpretar_bloque(const char *start, const char *end);
 static const unsigned char* ejecutar_condicional(const unsigned char *p, const unsigned char *end);
@@ -54,6 +54,11 @@ static double sin_approx(double x) {
 }
 static double cos_approx(double x) {
     return sin_approx(PI/2 - x);
+}
+
+static double fmod_approx(double acc, double rhs) {
+    int n = (int)(acc / rhs);   // truncamiento = floor para positivos
+    return acc - n * rhs;
 }
 
 // --- new: parse color names into enum values ---
@@ -184,23 +189,32 @@ static int eval_condition(const char *cond_str) {
 
     char lhs_s[64], rhs_s[64], op_s[3];
 
-    // extraer lhs
+    // extraer lhs, op y rhs
     memcpy(lhs_s, cond_str, pos);
     lhs_s[pos] = '\0';
-    // extraer op
     memcpy(op_s, cond_str + pos, op_len);
     op_s[op_len] = '\0';
-    // extraer rhs
-    strncpy(rhs_s, cond_str + pos + op_len, sizeof(rhs_s)-1);
-    rhs_s[sizeof(rhs_s)-1] = '\0';
+    strncpy(rhs_s, cond_str + pos + op_len, sizeof(rhs_s) - 1);
+    rhs_s[sizeof(rhs_s) - 1] = '\0';
 
     // recortar espacios
     trim(lhs_s);
     trim(rhs_s);
 
-    // ahora sí parsear y comparar
-    int lhs = eval_expr((char*[]){lhs_s}, 1, 0);
-    int rhs = eval_expr((char*[]){rhs_s}, 1, 0);
+    // parse tokens dinámicamente para lhs
+    char *args_lhs[7];
+    int argc_lhs = parsear_tokens(lhs_s, args_lhs, 7);
+    double lhs_val = eval_expr(args_lhs, argc_lhs, 0);
+
+    // parse tokens dinámicamente para rhs
+    char *args_rhs[7];
+    int argc_rhs = parsear_tokens(rhs_s, args_rhs, 7);
+    double rhs_val = eval_expr(args_rhs, argc_rhs, 0);
+
+    // convertir a int para la comparación
+    int lhs = (int)lhs_val;
+    int rhs = (int)rhs_val;
+
     return evaluar_condicion(lhs, op_s, rhs);
 }
 
@@ -365,7 +379,8 @@ static void ejecutar_una_linea(const char *line) {
         var_values[idx] = col;
       } else {
         // Asignación numérica habitual
-        int val = eval_expr(args, argc, 2);
+        double d = eval_expr(args, argc, 2);
+        int val = (int)(d >= 0 ? d + 0.5 : d - 0.5);
         set_var(args[0], val);
       }
       return;
@@ -520,6 +535,10 @@ static void ejecutar_una_linea(const char *line) {
         } else {
             println("Error: wait requiere 1 parámetros\n", 40);
         }
+        return;
+    }
+    if (strcmp(cmd, "clear") == 0) {
+        vga_clear_screen();
         return;
     }
 
@@ -899,9 +918,5 @@ static const unsigned char* ejecutar_loop(const unsigned char *p,
     return b_end + 1;
 }
 
-static double fmod_approx(double acc, double rhs) {
-    int n = (int)(acc / rhs);   // truncamiento = floor para positivos
-    return acc - n * rhs;
-}
 
 
