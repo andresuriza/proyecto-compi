@@ -16,17 +16,13 @@ Symbol *symbolTable = NULL;
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
-//void addPredefinedConstants();
 
 void yyerror(const char *s);
 %}
 
-// TODO chequear longitud de identifier
-// TODO rangos int, coords
-
 %union {
     double dValue;
-    char* id;      // index into symbolTable
+    char* id;
     nodeType* nPtr;
 };
 
@@ -51,21 +47,15 @@ void yyerror(const char *s);
 %token WAIT
 %token FRAME
 %token LOOP
-%token LE
-%token GE
-%token NE
-%token EQ
-%token PLUS
-%token MODULUS
 %token DRAW
-%token TREE
 %token END
 %token MOVE
 %token ANIMATE
 %token COS
 %token SIN
-%token PRINT
-%token INT FLOAT COLOR C_DECL I_DECL
+%token INT COLOR
+%token GE LE EQ NE
+%token I_DECL C_DECL
 
 %type <nPtr> stmt expr stmt_list frame conditional_body conditional assignment var_type
 %type <nPtr> int_list color_list
@@ -100,7 +90,9 @@ stmt:
         | SETCOLOR '(' expr ')' ';'  { $$ = opr(SETCOLOR, 1, $3); }
         | WAIT '(' expr ')' ';'  { $$ = opr(WAIT, 1, $3); }
         | DRAW PIXEL '(' expr ',' expr ')' ';'  { $$ = opr(PIXEL, 2, $4, $6); }
-        | DRAW TREE '(' expr ',' expr ',' expr ',' expr ',' expr ')' ';'  { $$ = opr(TREE, 2, $4, $6, $8, $10, $12); }
+        | DRAW LINE '(' expr ',' expr ',' expr ',' expr ')' ';'  { $$ = opr(LINE, 2, $4, $6, $8, $10); }
+        | DRAW CIRCLE '(' expr ',' expr ','  expr')' ';'  { $$ = opr(CIRCLE, 2, $4, $6, $8); }
+        | DRAW RECT '(' expr ',' expr ',' expr ',' expr ')' ';'  { $$ = opr(RECT, 2, $4, $6, $8, $10); }
         | error ';' { fprintf(stderr, "Error en sentencia\n"); yyerrok; $$ = NULL; }
         ;
 
@@ -167,7 +159,6 @@ conditional:
          | error { fprintf(stderr, "Error en condición lógica\n"); yyerrok; $$ = NULL; }
          ;
 
-
 %%
 
 nodeType *conColor(const char *name) {
@@ -186,6 +177,34 @@ nodeType *conColor(const char *name) {
 
     else if (strcmp(name, "azul") == 0) {
         p->con.value = AZUL;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "negro") == 0) {
+        p->con.value = NEGRO;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "cyan") == 0) {
+        p->con.value = CYAN;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "magenta") == 0) {
+        p->con.value = MAGENTA;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "cafe") == 0) {
+        p->con.value = CAFE;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "gris") == 0) {
+        p->con.value = GRIS;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "amarillo") == 0) {
+        p->con.value = AMARILLO;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "blanco") == 0) {
+        p->con.value = BLANCO;
         p->con.type = SYM_COLOR;
     }  
     
@@ -261,12 +280,7 @@ void yyerror(const char *s) {
     exit(1);  // Detiene inmediatamente
 }
 
-
-
 int main(void) {
-    //addPredefinedConstants();
-
     yyparse();
-
     return 0;
 }

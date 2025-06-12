@@ -15,7 +15,7 @@ void yyerror (char *);
 "azul" { yylval.id = strdup(yytext); return COLORTYPE; }
 "azulon" { yylval.id = strdup(yytext); return COLORTYPE; }
 "negro" { yylval.id = strdup(yytext); return COLORTYPE; }
-"cian" { yylval.id = strdup(yytext); return COLORTYPE; }
+"cyan" { yylval.id = strdup(yytext); return COLORTYPE; }
 "cianon" { yylval.id = strdup(yytext); return COLORTYPE; }
 "magenta" { yylval.id = strdup(yytext); return COLORTYPE; }
 "magenton" { yylval.id = strdup(yytext); return COLORTYPE; }
@@ -35,15 +35,12 @@ void yyerror (char *);
 "line" { return LINE; }
 "circle" { return CIRCLE; }
 "rect" { return RECT; }
-"tree" { return TREE; }
 "move" { return MOVE; }
 "animate" { return ANIMATE; }
 "cos" { return COS; }
 "sin" { return SIN; }
 "pixel" { return PIXEL; }
-"print" { return PRINT; }
 "int"       { return INT; }
-"float"     { return FLOAT; }
 "color"     { return COLOR; }
 
 [0-9]+\.[0-9]+ {yylval.dValue = atof(yytext); return INTEGER;}

@@ -4,7 +4,14 @@ typedef enum { SYM_NUMBER, SYM_COLOR } SymbolType;
 typedef enum {
     ROJO,
     VERDE,
-    AZUL
+    AZUL,
+    NEGRO,
+    CYAN,
+    MAGENTA,
+    CAFE,
+    GRIS,
+    AMARILLO,
+    BLANCO
 } ColorValue;
 
 /* constants */

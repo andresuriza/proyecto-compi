@@ -71,25 +71,20 @@ extern int yydebug;
     WAIT = 272,                    /* WAIT  */
     FRAME = 273,                   /* FRAME  */
     LOOP = 274,                    /* LOOP  */
-    LE = 275,                      /* LE  */
-    GE = 276,                      /* GE  */
-    NE = 277,                      /* NE  */
-    EQ = 278,                      /* EQ  */
-    PLUS = 279,                    /* PLUS  */
-    MODULUS = 280,                 /* MODULUS  */
-    DRAW = 281,                    /* DRAW  */
-    TREE = 282,                    /* TREE  */
-    END = 283,                     /* END  */
-    MOVE = 284,                    /* MOVE  */
-    ANIMATE = 285,                 /* ANIMATE  */
-    COS = 286,                     /* COS  */
-    SIN = 287,                     /* SIN  */
-    PRINT = 288,                   /* PRINT  */
-    INT = 289,                     /* INT  */
-    FLOAT = 290,                   /* FLOAT  */
-    COLOR = 291,                   /* COLOR  */
-    C_DECL = 292,                  /* C_DECL  */
-    I_DECL = 293                   /* I_DECL  */
+    DRAW = 275,                    /* DRAW  */
+    END = 276,                     /* END  */
+    MOVE = 277,                    /* MOVE  */
+    ANIMATE = 278,                 /* ANIMATE  */
+    COS = 279,                     /* COS  */
+    SIN = 280,                     /* SIN  */
+    INT = 281,                     /* INT  */
+    COLOR = 282,                   /* COLOR  */
+    GE = 283,                      /* GE  */
+    LE = 284,                      /* LE  */
+    EQ = 285,                      /* EQ  */
+    NE = 286,                      /* NE  */
+    I_DECL = 287,                  /* I_DECL  */
+    C_DECL = 288                   /* C_DECL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -115,37 +110,32 @@ extern int yydebug;
 #define WAIT 272
 #define FRAME 273
 #define LOOP 274
-#define LE 275
-#define GE 276
-#define NE 277
-#define EQ 278
-#define PLUS 279
-#define MODULUS 280
-#define DRAW 281
-#define TREE 282
-#define END 283
-#define MOVE 284
-#define ANIMATE 285
-#define COS 286
-#define SIN 287
-#define PRINT 288
-#define INT 289
-#define FLOAT 290
-#define COLOR 291
-#define C_DECL 292
-#define I_DECL 293
+#define DRAW 275
+#define END 276
+#define MOVE 277
+#define ANIMATE 278
+#define COS 279
+#define SIN 280
+#define INT 281
+#define COLOR 282
+#define GE 283
+#define LE 284
+#define EQ 285
+#define NE 286
+#define I_DECL 287
+#define C_DECL 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 27 "vgraph.y"
+#line 23 "vgraph.y"
 
     double dValue;
-    char* id;      // index into symbolTable
+    char* id;
     nodeType* nPtr;
 
-#line 149 "y.tab.h"
+#line 139 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

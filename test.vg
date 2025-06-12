@@ -1,5 +1,6 @@
-(int) x;
+# Variables para las posiciones y colores
+(int) tilin;
 
 frame {
-	x = 7;
+	tilin = 1;
 }
