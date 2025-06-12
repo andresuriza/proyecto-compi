@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sebas/Documents/proyecto-compi
+CMAKE_SOURCE_DIR = /media/sf_Ubuntu_shared/proyecto-compi
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sebas/Documents/proyecto-compi/build
+CMAKE_BINARY_DIR = /media/sf_Ubuntu_shared/proyecto-compi/build
 
 # Utility rule file for vgraph_ide_autogen_timestamp_deps.
 
@@ -67,8 +67,8 @@ include CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/compiler_depend.make
 include CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/progress.make
 
 CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13
-CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
 CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/moc
+CMakeFiles/vgraph_ide_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
 
 vgraph_ide_autogen_timestamp_deps: CMakeFiles/vgraph_ide_autogen_timestamp_deps
 vgraph_ide_autogen_timestamp_deps: CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/build.make
@@ -83,6 +83,6 @@ CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/clean:
 .PHONY : CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/clean
 
 CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/depend:
-	cd /home/sebas/Documents/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /media/sf_Ubuntu_shared/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir/depend
 

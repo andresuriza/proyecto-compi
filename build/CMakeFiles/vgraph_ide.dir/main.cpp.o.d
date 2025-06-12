@@ -1,5 +1,6 @@
 CMakeFiles/vgraph_ide.dir/main.cpp.o: \
- /home/sebas/Documents/proyecto-compi/main.cpp /usr/include/stdc-predef.h \
+ /media/sf_Ubuntu_shared/proyecto-compi/main.cpp \
+ /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \
@@ -410,4 +411,4 @@ CMakeFiles/vgraph_ide.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcontiguouscache.h \
- /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/include/main.moc
+ /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/include/main.moc

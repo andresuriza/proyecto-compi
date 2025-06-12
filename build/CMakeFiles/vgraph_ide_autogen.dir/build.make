@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sebas/Documents/proyecto-compi
+CMAKE_SOURCE_DIR = /media/sf_Ubuntu_shared/proyecto-compi
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sebas/Documents/proyecto-compi/build
+CMAKE_BINARY_DIR = /media/sf_Ubuntu_shared/proyecto-compi/build
 
 # Utility rule file for vgraph_ide_autogen.
 
@@ -71,9 +71,9 @@ CMakeFiles/vgraph_ide_autogen: vgraph_ide_autogen/timestamp
 vgraph_ide_autogen/timestamp: /usr/lib/qt5/bin/moc
 vgraph_ide_autogen/timestamp: /usr/lib/qt5/bin/uic
 vgraph_ide_autogen/timestamp: CMakeFiles/vgraph_ide_autogen.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/sebas/Documents/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target vgraph_ide"
-	/usr/bin/cmake -E cmake_autogen /home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/AutogenInfo.json ""
-	/usr/bin/cmake -E touch /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/timestamp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target vgraph_ide"
+	/usr/bin/cmake -E cmake_autogen /media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/AutogenInfo.json ""
+	/usr/bin/cmake -E touch /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/timestamp
 
 vgraph_ide_autogen: CMakeFiles/vgraph_ide_autogen
 vgraph_ide_autogen: vgraph_ide_autogen/timestamp
@@ -89,6 +89,6 @@ CMakeFiles/vgraph_ide_autogen.dir/clean:
 .PHONY : CMakeFiles/vgraph_ide_autogen.dir/clean
 
 CMakeFiles/vgraph_ide_autogen.dir/depend:
-	cd /home/sebas/Documents/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /media/sf_Ubuntu_shared/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/vgraph_ide_autogen.dir/depend
 

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/sebas/Documents/proyecto-compi
+CMAKE_SOURCE_DIR = /media/sf_Ubuntu_shared/proyecto-compi
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/sebas/Documents/proyecto-compi/build
+CMAKE_BINARY_DIR = /media/sf_Ubuntu_shared/proyecto-compi/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/vgraph_ide.dir/depend.make
@@ -72,37 +72,37 @@ include CMakeFiles/vgraph_ide.dir/flags.make
 vgraph_ide_autogen/timestamp: /usr/lib/qt5/bin/moc
 vgraph_ide_autogen/timestamp: /usr/lib/qt5/bin/uic
 vgraph_ide_autogen/timestamp: CMakeFiles/vgraph_ide.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/sebas/Documents/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target vgraph_ide"
-	/usr/bin/cmake -E cmake_autogen /home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/AutogenInfo.json ""
-	/usr/bin/cmake -E touch /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/timestamp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target vgraph_ide"
+	/usr/bin/cmake -E cmake_autogen /media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir/AutogenInfo.json ""
+	/usr/bin/cmake -E touch /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/timestamp
 
 CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o: CMakeFiles/vgraph_ide.dir/flags.make
 CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o: vgraph_ide_autogen/mocs_compilation.cpp
 CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o: CMakeFiles/vgraph_ide.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebas/Documents/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o -MF CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o -c /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o -MF CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.o -c /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp
 
 CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp > CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp > CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.i
 
 CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sebas/Documents/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp -o CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_Ubuntu_shared/proyecto-compi/build/vgraph_ide_autogen/mocs_compilation.cpp -o CMakeFiles/vgraph_ide.dir/vgraph_ide_autogen/mocs_compilation.cpp.s
 
 CMakeFiles/vgraph_ide.dir/main.cpp.o: CMakeFiles/vgraph_ide.dir/flags.make
-CMakeFiles/vgraph_ide.dir/main.cpp.o: /home/sebas/Documents/proyecto-compi/main.cpp
+CMakeFiles/vgraph_ide.dir/main.cpp.o: /media/sf_Ubuntu_shared/proyecto-compi/main.cpp
 CMakeFiles/vgraph_ide.dir/main.cpp.o: CMakeFiles/vgraph_ide.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sebas/Documents/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/vgraph_ide.dir/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vgraph_ide.dir/main.cpp.o -MF CMakeFiles/vgraph_ide.dir/main.cpp.o.d -o CMakeFiles/vgraph_ide.dir/main.cpp.o -c /home/sebas/Documents/proyecto-compi/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/vgraph_ide.dir/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/vgraph_ide.dir/main.cpp.o -MF CMakeFiles/vgraph_ide.dir/main.cpp.o.d -o CMakeFiles/vgraph_ide.dir/main.cpp.o -c /media/sf_Ubuntu_shared/proyecto-compi/main.cpp
 
 CMakeFiles/vgraph_ide.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/vgraph_ide.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sebas/Documents/proyecto-compi/main.cpp > CMakeFiles/vgraph_ide.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/sf_Ubuntu_shared/proyecto-compi/main.cpp > CMakeFiles/vgraph_ide.dir/main.cpp.i
 
 CMakeFiles/vgraph_ide.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/vgraph_ide.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sebas/Documents/proyecto-compi/main.cpp -o CMakeFiles/vgraph_ide.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_Ubuntu_shared/proyecto-compi/main.cpp -o CMakeFiles/vgraph_ide.dir/main.cpp.s
 
 # Object files for target vgraph_ide
 vgraph_ide_OBJECTS = \
@@ -119,7 +119,7 @@ vgraph_ide: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13
 vgraph_ide: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13
 vgraph_ide: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.15.13
 vgraph_ide: CMakeFiles/vgraph_ide.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/sebas/Documents/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable vgraph_ide"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable vgraph_ide"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/vgraph_ide.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -131,6 +131,6 @@ CMakeFiles/vgraph_ide.dir/clean:
 .PHONY : CMakeFiles/vgraph_ide.dir/clean
 
 CMakeFiles/vgraph_ide.dir/depend: vgraph_ide_autogen/timestamp
-	cd /home/sebas/Documents/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build /home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /media/sf_Ubuntu_shared/proyecto-compi/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build /media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/vgraph_ide.dir/depend
 
