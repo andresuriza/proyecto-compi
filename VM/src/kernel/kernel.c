@@ -6,7 +6,7 @@
 #include "../input/interpreter.h"
 
 // ----- VGA initialization imports -----
-extern unsigned char g_320x200x256[];
+extern unsigned char g_640x480x16[];
 extern void write_regs(unsigned char *regs);
 extern void vga_clear_screen(void);
 
@@ -154,10 +154,10 @@ void print_message() {
 }
 
 void main() {
-	write_regs(g_320x200x256);
+	write_regs(g_640x480x16);
 	vga_clear_screen();
 
-	interpret_vgraph("ordenes.txt");
+	interpret_vgraph("ordenes.vg");
 
 	disable_cursor();
 	init_idt();

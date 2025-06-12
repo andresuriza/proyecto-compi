@@ -30,7 +30,7 @@ void vga_clear_screen();
 #define	VGA_NUM_GC_REGS		9
 #define	VGA_NUM_SEQ_REGS	5
 
-extern unsigned char g_320x200x256[];
+extern unsigned char g_640x480x16[];
 void write_regs(unsigned char *regs);
 void io_wait(void);
 void tree(int x, int y, double len, double ang, int depth);
