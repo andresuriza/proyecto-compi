@@ -11,18 +11,19 @@ typedef enum {
     CAFE,
     GRIS,
     AMARILLO,
-    BLANCO
+    BLANCO,
+    MARRON
 } ColorValue;
 
 /* constants */
 typedef struct {
-    double value;                  /* value of constant */
-    SymbolType type;  // SYM_NUMBER or SYM_COLOR
+    double value; 
+    SymbolType type;  
 } conNodeType;
 
 /* identifiers */
 typedef struct {
-    char* name;                      /* subscript to sym array */
+    char* name;  
 } idNodeType;
 
 /* operators */

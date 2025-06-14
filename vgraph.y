@@ -56,9 +56,12 @@ void yyerror(const char *s);
 %token INT COLOR
 %token GE LE EQ NE
 %token I_DECL C_DECL
+%token FUNCTION RETURN CLEAR
 
 %type <nPtr> stmt expr stmt_list frame conditional_body conditional assignment var_type
-%type <nPtr> int_list color_list
+%type <nPtr> int_list color_list param_list_opt func_def
+
+// TODO AGREGAR MARRON
 
 %%
 
@@ -70,6 +73,7 @@ program:
 function:
           function stmt { ex($2); freeNode($2); }
         | function frame { ex($2); freeNode($2); }
+        | function func_def { ex($2); freeNode($2); }
         | /* NULL */
         | error { fprintf(stderr, "Error en 'function'\n"); yyerrok; }
         ;
@@ -79,11 +83,27 @@ frame:
         | error { fprintf(stderr, "Error en definición de 'frame'\n"); yyerrok; $$ = NULL; }
         ;
 
+
+func_def:
+    FUNCTION VARIABLE '(' param_list_opt ')' '{' stmt_list '}' { $$ = $7; }
+    | error { fprintf(stderr, "Error en definición de funcion\n"); yyerrok; $$ = NULL; }
+    ;
+
+param_list_opt:
+      VARIABLE {}
+    | expr {}
+    | param_list_opt ',' VARIABLE {}
+    | param_list_opt ',' expr {}
+    ;
+
 stmt:
           ';'   { $$ = opr(';', 2, NULL, NULL); }
         | var_type ';' { $$ = $1; }
         | expr ';'  { $$ = $1; }
         | assignment ';'  { $$ = $1; }
+        | RETURN ';' { $$ = opr(FUNC, 0); }
+        | CLEAR '(' ')' { $$ = opr(FUNC, 0); } // CAMBIAR
+        | VARIABLE '(' param_list_opt ')' ';' { $$ = $3; }
         | LOOP '(' assignment ';' conditional ';'  assignment ')' conditional_body { $$ = opr(LOOP, 4, $3, $5, $7, $9); }
         | IF '(' conditional ')' conditional_body %prec IFX { $$ = opr(IF, 2, $3, $5); }
         | IF '(' conditional ')' conditional_body ELSE conditional_body { $$ = opr(IF, 3, $3, $5, $7); }
@@ -205,6 +225,10 @@ nodeType *conColor(const char *name) {
     }  
     else if (strcmp(name, "blanco") == 0) {
         p->con.value = BLANCO;
+        p->con.type = SYM_COLOR;
+    }  
+    else if (strcmp(name, "marron") == 0) {
+        p->con.value = MARRON;
         p->con.type = SYM_COLOR;
     }  
     

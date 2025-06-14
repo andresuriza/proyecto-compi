@@ -52,6 +52,30 @@ void getColor(ColorValue c) {
         case VERDE:
             printf("Verde \n");
             break;
+        case NEGRO:
+            printf("Negro \n");
+            break;
+        case CYAN:
+            printf("CYAN \n");
+            break;
+        case MAGENTA:
+            printf("MAGENTA \n");
+            break;
+        case CAFE:
+            printf("CAFE \n");
+            break;
+        case GRIS:
+            printf("GRIS \n");
+            break;
+        case AMARILLO:
+            printf("AMARIALLO \n");
+            break;
+        case BLANCO:
+            printf("BLANCO \n");
+            break;
+        case MARRON:
+            printf("MARRON \n");
+            break;
     }
 }
 
@@ -79,6 +103,7 @@ double ex(nodeType *p) {
                         getColor(s->value.color); 
                         return 0;
             case WAIT: printf("Waiting: %f \n", ex(p->opr.op[0])); return 0;
+            case FUNC: return 0;
             case PIXEL: 
                         printf("drawing at: (%f, %f) \n", ex(p->opr.op[0]), ex(p->opr.op[1])); 
                         return 0;

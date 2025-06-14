@@ -84,7 +84,10 @@ extern int yydebug;
     EQ = 285,                      /* EQ  */
     NE = 286,                      /* NE  */
     I_DECL = 287,                  /* I_DECL  */
-    C_DECL = 288                   /* C_DECL  */
+    C_DECL = 288,                  /* C_DECL  */
+    FUNCTION = 289,                /* FUNCTION  */
+    RETURN = 290,                  /* RETURN  */
+    CLEAR = 291                    /* CLEAR  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -124,6 +127,9 @@ extern int yydebug;
 #define NE 286
 #define I_DECL 287
 #define C_DECL 288
+#define FUNCTION 289
+#define RETURN 290
+#define CLEAR 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -135,7 +141,7 @@ union YYSTYPE
     char* id;
     nodeType* nPtr;
 
-#line 139 "y.tab.h"
+#line 145 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
