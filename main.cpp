@@ -131,17 +131,32 @@ QRegularExpression("^\\s*[a-z][a-zA-Z0-9]*\\s*=\\s*.+;\\s*(#.*)?$"),
 
     // Instrucciones draw
     QRegularExpression("^\\s*draw\\s+(line|circle|rect|pixel|tree)\\s*\\(.*\\)\\s*;\\s*$"),
+    QRegularExpression("^\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(.*\\)\\s*;\\s*(#.*)?$"),
+        
 
     // setcolor y wait
     QRegularExpression("^\\s*setcolor\\s*\\(.*\\)\\s*;\\s*$"),
     QRegularExpression("^\\s*wait\\s*\\([^\\)]+\\)\\s*;\\s*(#.*)?$"),
 
+
+    QRegularExpression("^\\s*function\\s+[a-zA-Z_][a-zA-Z0-9_]*\\s*\\([^)]*\\)\\s*\\{\\s*$"),
+    QRegularExpression("^\\s*clear\\s*\\(\\s*\\)\\s*;\\s*(#.*)?$"),
+    QRegularExpression("^\\s*return\\s*;\\s*(#.*)?$"),
+    
+
     // Estructuras de control
     QRegularExpression("^\\s*frame\\s*\\{\\s*$"),
     QRegularExpression("^\\s*loop\\s*\\(.*\\)\\s*\\{\\s*$"),
-    QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),             // ✅ acepta condiciones complejas
-    QRegularExpression("^\\s*else\\s+if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),     // ✅ acepta condiciones complejas
+        // Line opens block
+    QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s+if\\s*\\([^\\)]+\\)\\s*\\{\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s*\\{\\s*(#.*)?$"),
+
+    // Single-line block
+    QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s+if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),
     QRegularExpression("^\\s*else\\s*\\{.*\\}\\s*(#.*)?$"),
+
     QRegularExpression("^\\s*end\\s*$"),
     QRegularExpression("^\\s*\\}\\s*$"),
 
