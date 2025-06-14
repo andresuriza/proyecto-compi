@@ -1,11 +1,27 @@
-x = 200; # asignación de x = 100
-y = 100;
-i = 0; # asignación de i = 1
+(int) cx, cy, radius, x, y, dx, dy, height;
+(color) col;
+
+cx  = 1;     
+cy  = 470;
+height = 0;
+
+
 frame {
-	loop (i = 0; i < 100; i = i + 10) {
-	setcolor (verde);
-	draw circle (400, 300, i); # pinta círculo dinámicamente
-	wait (5);
-	}
+    loop (radius = 1; radius < 280; radius = radius + 5) {
+        col = verde;
+        setcolor (col);
+        draw circle (cx, cy, radius);
+        wait (5);
+        cx = cx + 10;
+        cy = cy - 10;
+        x = cx + 20;
+        y = cy - 30;
+        setcolor (rojo);
+        draw circle (x, y, radius);
+        wait (5);
+    }
 }
+
+
+
 

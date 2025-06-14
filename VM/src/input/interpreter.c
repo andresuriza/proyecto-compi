@@ -48,12 +48,12 @@ static int   var_values[MAX_VARS];
 static int   var_count = 0;
 static double var_values_dbl[MAX_VARS];
 
-static double sin_approx(double x) {
+static double cos_approx(double x) {
     double x2 = x*x;
     return x - x*x2/6.0 + x2*x2/120.0 - x2*x2*x2/5040.0;
 }
-static double cos_approx(double x) {
-    return sin_approx(PI/2 - x);
+static double sin_approx(double x) {
+    return cos_approx(PI/2 - x);
 }
 
 static double fmod_approx(double acc, double rhs) {
@@ -102,7 +102,7 @@ static double eval_expr(char *args[], int argc, int start) {
         else if (strcmp(op, "-") == 0) acc -= rhs;
         else if (strcmp(op, "*") == 0) acc *= rhs;
         else if (strcmp(op, "/") == 0) acc /= rhs;
-        else if (strcmp(op, "%") == 0) acc = fmod_approx(acc, rhs);
+        else if (strcmp(op, "%") == 0) acc = (int) acc % (int) rhs;
         else {
             print("Error: operador desconocido en expr\n", 33);
         }
@@ -233,51 +233,35 @@ static int parsear_tokens(char *buffer, char *args[], int max) {
     char *p = buffer;
 
     while (*p != '\0' && argc < max) {
-        // Saltar espacios y tabs
-        while (*p == ' ' || *p == '\t') {
+        // 1) Saltar separadores: espacios, tabs, comas, punto y coma, paréntesis
+        while (*p == ' ' || *p == '\t' || *p == ',' ||
+               *p == ';' ||
+               *p == '(' || *p == ')') {
             p++;
         }
-        if (*p == '\0' || *p == ';') break;
+        if (*p == '\0') break;
 
-        // Marcar el inicio del token
+        // 2) Marcar inicio de token
         args[argc++] = p;
 
-        // Si empieza con paréntesis, procesar hasta cierre
-        if (*p == '(') {
-            p++; // saltar el '('
-            args[argc - 1] = p; // argumento real empieza después de '('
-
-            while (*p != ')' && *p != '\0' && argc < max) {
-                if (*p == ',') {
-                    *p = '\0'; // separar el argumento
-                    p++;
-                    while (*p == ' ' || *p == '\t') p++; // saltar espacios
-                    if (*p != ')' && *p != '\0') {
-                        args[argc++] = p;
-                    }
-                } else {
-                    p++;
-                }
-            }
-
-            if (*p == ')') {
-                *p = '\0'; // terminar el último argumento
-                p++; // avanzar después del ')'
-            }
-        } else {
-            // Avanzar hasta el próximo separador
-            while (*p != '\0' && *p != ' ' && *p != '\t' && *p != ';') {
-                p++;
-            }
-            if (*p == ' ' || *p == '\t' || *p == ';') {
-                *p = '\0';
-                p++;
-            }
+        // 3) Avanzar hasta el próximo separador
+        while (*p != '\0' &&
+               *p != ' ' && *p != '\t' &&
+               *p != ',' && *p != ';' &&
+               *p != '(' && *p != ')') {
+            p++;
+        }
+        // 4) Cerrar token
+        if (*p != '\0') {
+            *p = '\0';
+            p++;
         }
     }
 
     return argc;
 }
+
+
 
 
 // -----------------------------------------------------------------------------
@@ -475,10 +459,10 @@ static void ejecutar_una_linea(const char *line) {
       // ================================================================
       if (strcmp(cmd2, "spiral") == 0) {
           if (argc == 5) {
-              double cx            = parse_number_or_var(args[2]);
-              double cy            = parse_number_or_var(args[3]);
-              double r          = parse_number_or_var(args[4]);
-              animate_spiral(cx, cy, r);
+              double cx     = parse_number_or_var(args[2]);
+              double cy     = parse_number_or_var(args[3]);
+              double radius_max = parse_number_or_var(args[4]);
+              animate_spiral(cx, cy, radius_max);
           } else {
               println("Error: animate_spiral requiere 3 parámetros\n", 40);
           }

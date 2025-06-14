@@ -3,12 +3,14 @@
 #include "../common/stdlib.h"
 #include "../screen/screen.h"
 #include "../vga/vga.h"
+#include "../vga/vga_color.h"
 #include "../input/interpreter.h"
 
 // ----- VGA initialization imports -----
 extern unsigned char g_640x480x16[];
 extern void write_regs(unsigned char *regs);
 extern void vga_clear_screen(void);
+
 
 // Códigos de escaneo para tus comandos
 #define SCAN_T 20   // 't'
@@ -92,7 +94,7 @@ void handle_keyboard_interrupt() {
 		if (keycode < 0 || keycode >= 128) return;
 		else if (keycode == SCAN_M) {
 			for (int i = 0; i < 1; i++) {
-				send_vga_command("animate tree (160,180,60,90,6);");
+				send_vga_command("animate tree (320,400,100,0,6);");
 			}
 			live_command_ready = 1;
 		}
@@ -156,7 +158,6 @@ void print_message() {
 void main() {
 	write_regs(g_640x480x16);
 	vga_clear_screen();
-
 	interpret_vgraph("ordenes.vg");
 
 	disable_cursor();

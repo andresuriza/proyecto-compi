@@ -39,8 +39,8 @@ void draw_mandala_frame(int cx, int cy,int t);
 void animate_mandala(int cx, int cy);
 void wait_ticks(int ticks);
 void wait_ms(int ms);
+void draw_spiral_frame(int cx, int cy, int r_max);
 void animate_spiral(int cx, int cy, int radius_max);
-void draw_spiral_frame(int cx, int cy, int t_max);
 void wait(int s);
 int cos_deg(int deg);
 
