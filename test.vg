@@ -1,5 +1,43 @@
-(int) x;
+(int) r, x, y, t, paso, offset;
+(color) c;
 
 frame {
-	x = rojo;
+    # Inicializacion
+    paso = 8;
+    offset = 0;
+
+    loop (t = 0; t < 360; t = t + paso) {
+        # Dibujar círculos concentricos
+        loop (r = 10; r <= 100; r = r + 10) {
+            if (r % 20 == 0) { c = azul; }
+            else { c = verde; }
+            setcolor(c);
+            draw circle(320, 240, r);
+        }
+
+        # Dibujar espiral radial (sin sin/cos)
+        loop (r = 0; r < 200; r = r + 10) {
+            # Usar aproximaciones: rotar en cuadrantes alternando X y Y
+            if ((r / 10 + t / paso) % 4 == 0) {
+                x = 320 + r;
+                y = 240;
+            } else if ((r / 10 + t / paso) % 4 == 1) {
+                x = 320;
+                y = 240 + r;
+            } else if ((r / 10 + t / paso) % 4 == 2) {
+                x = 320 - r;
+                y = 240;
+            } else {
+                x = 320;
+                y = 240 - r;
+            }
+
+            if (r % 30 == 0) { c = rojo; }
+            else { c = blanco; }
+            setcolor(c);
+            draw pixel(x, y);
+        }
+
+        wait(3);
+    }
 }

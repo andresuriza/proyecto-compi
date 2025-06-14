@@ -1,0 +1,63 @@
+(int) cx, cy, x1, y1, x2, y2, paso, lado, dir, i, j;
+(color) col;
+
+frame {
+    # Inicializacion
+    cx = 320;
+    cy = 240;
+    x1 = cx;
+    y1 = cy;
+    paso = 10;
+    lado = 10;   # Largo inicial
+    dir = 0;
+
+    loop (i = 0; i < 50; i = i + 1) {
+        # Hacer dos lados por iteracion (para cuadrado uniforme)
+        loop (j = 0; j < 2; j = j + 1) {
+            # Calcular punto final segun direccion
+            if (dir == 0) {  # derecha
+                x2 = x1 + lado;
+                y2 = y1;
+            }
+            if (dir == 1) {  # abajo
+                x2 = x1;
+                y2 = y1 + lado;
+            }
+            if (dir == 2) {  # izquierda
+                x2 = x1 - lado;
+                y2 = y1;
+            }
+            if (dir == 3) {  # arriba
+                x2 = x1;
+                y2 = y1 - lado;
+            }
+
+            # Cambiar color
+            if ((i + j) % 3 == 0) {
+                col = rojo;
+            }
+            if ((i + j) % 3 == 1) {
+                col = cyan;
+            }
+            if ((i + j) % 3 == 2) {
+                col = amarillo;
+            }
+
+            setcolor (col);
+            draw line (x1, y1, x2, y2);
+            wait (1);
+
+            # Actualizar punto inicial
+            x1 = x2;
+            y1 = y2;
+
+            # Cambiar direccion (0 → 1 → 2 → 3 → 0 ...)
+            dir = dir + 1;
+            if (dir == 4) {
+                dir = 0;
+            }
+        }
+        # Aumentar longitud para expandir la espiral
+        lado = lado + paso;
+    }
+}

@@ -86,7 +86,7 @@ FILE *out;
 Symbol *symbolTable = NULL;
 
 void freeNode(nodeType *p);
-int ex(FILE *out, nodeType *p);
+int ex(nodeType *p, FILE *out);
 int yylex(void);
 void start_interpreter_file(FILE **out);
 void end_interpreter_file(FILE *out);
