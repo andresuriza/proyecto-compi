@@ -1,0 +1,29 @@
+# Variables
+(int) mastX, masty0, masty1, x, y;
+(int) flagW, flagH;
+(int) flagOffsetX, flagOffsetY;
+(color) mastColor, flagColor;
+
+frame {
+	mastX = 120;
+	masty0 = 50;
+	masty1 = 300;
+	flagW = 80;
+	flagH = 70;
+	flagOffsetX = 0;
+	flagOffsetY = 0;
+	mastColor = azul;
+	flagColor = rojo;
+
+    # Mástil
+    setcolor (mastColor);
+    draw line (mastX, masty0, mastX, masty1);
+
+    # Coordenadas de la esquina superior izquierda de la bandera
+    x = mastX + flagOffsetX;
+    y = masty0 + flagOffsetY;
+
+    # Dibuja el contorno de la bandera
+    setcolor (flagColor);
+    draw rect (x, y, flagW, flagH);
+}

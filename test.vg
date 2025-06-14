@@ -1,7 +1,5 @@
-(color) c;
+(int) x;
 
 frame {
-	c = blanco;
-	setcolor(c);
-	draw line(200, 200, 100, 500);
+	x = rojo;
 }

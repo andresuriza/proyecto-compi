@@ -1,0 +1,23 @@
+(int) cx, cy, radius, x, y, dx, dy, height;
+(color) col, r;
+
+frame {
+	cx  = 1;     
+	cy  = 470;
+	height = 0;
+	r = rojo;
+
+    loop (radius = 1; radius < 280; radius = radius + 5) {
+        col = verde;
+        setcolor(col);
+        draw circle(cx, cy, radius);
+	wait (5);
+        cx = cx + 10;
+        cy = cy - 10;
+        x = cx + 20;
+        y = cy - 30;
+        setcolor(r);
+        draw circle(x, y, radius);
+	wait (5);
+    }
+}
