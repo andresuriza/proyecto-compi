@@ -16,6 +16,7 @@
 #include <QRegularExpression>
 #include <QListWidget>
 #include <qtermwidget5/qtermwidget.h>
+#include <QDebug>
 
 class IDEWindow : public QMainWindow {
     Q_OBJECT
@@ -61,8 +62,10 @@ public:
         setWindowTitle("VGraph IDE");
         resize(1000, 700);
 
-        terminal->startShellProgram();
-        connect(terminal, &QTermWidget::receivedData, this, &IDEWindow::handleTerminalOutput);
+        terminal->setShellProgram("/bin/bash"); // ✅ Forzar bash explícitamente
+terminal->startShellProgram();
+connect(terminal, &QTermWidget::receivedData, this, &IDEWindow::handleTerminalOutput);
+
 
     }
 
@@ -120,20 +123,50 @@ private slots:
         bool valid = true;
 
         QRegularExpression validPatterns[] = {
-            QRegularExpression("^\\s*(\\(int\\)|\\(color\\))\\s+[a-z][a-zA-Z0-9]{0,9}(\\s*=\\s*[^;]+)?\\s*;\\s*$"),
-            QRegularExpression("^\\s*[a-z][a-zA-Z0-9]{0,9}\\s*=\\s*[^;]+\\s*;\\s*$"),
-            QRegularExpression("^\\s*draw\\s+(line|circle|rect|pixel)\\s*\\([^\\)]*\\)\\s*;\\s*$"),
-            QRegularExpression("^\\s*setcolor\\s*\\([^\\)]+\\)\\s*;\\s*$"),
-            QRegularExpression("^\\s*frame\\s*\\{\\s*$"),
-            QRegularExpression("^\\s*loop\\s*\\([^\\)]+\\)\\s*\\{\\s*$"),
-            QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{\\s*$"),
-            QRegularExpression("^\\s*else\\s*\\{\\s*$"),
-            QRegularExpression("^\\s*wait\\s*\\([^\\)]+\\)\\s*;\\s*$"),
-            QRegularExpression("^\\s*end\\s*$"),
-            QRegularExpression("^\\s*\\}\\s*$"),
-            QRegularExpression("^\\s*#.*$"),
-            QRegularExpression("^\\s*$")
-        };
+    // Declaración de variables
+    QRegularExpression("^\\s*\\((int|color)\\)\\s+[a-z][a-zA-Z0-9]*(\\s*,\\s*[a-z][a-zA-Z0-9]*)*\\s*;\\s*$"),
+
+    // Asignaciones
+QRegularExpression("^\\s*[a-z][a-zA-Z0-9]*\\s*=\\s*.+;\\s*(#.*)?$"),
+
+    // Instrucciones draw
+    QRegularExpression("^\\s*draw\\s+(line|circle|rect|pixel|tree)\\s*\\(.*\\)\\s*;\\s*$"),
+    QRegularExpression("^\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(.*\\)\\s*;\\s*(#.*)?$"),
+        
+
+    // setcolor y wait
+    QRegularExpression("^\\s*setcolor\\s*\\(.*\\)\\s*;\\s*$"),
+    QRegularExpression("^\\s*wait\\s*\\([^\\)]+\\)\\s*;\\s*(#.*)?$"),
+
+
+    QRegularExpression("^\\s*function\\s+[a-zA-Z_][a-zA-Z0-9_]*\\s*\\([^)]*\\)\\s*\\{\\s*$"),
+    QRegularExpression("^\\s*clear\\s*\\(\\s*\\)\\s*;\\s*(#.*)?$"),
+    QRegularExpression("^\\s*return\\s*;\\s*(#.*)?$"),
+    
+
+    // Estructuras de control
+    QRegularExpression("^\\s*frame\\s*\\{\\s*$"),
+    QRegularExpression("^\\s*loop\\s*\\(.*\\)\\s*\\{\\s*$"),
+        // Line opens block
+    QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s+if\\s*\\([^\\)]+\\)\\s*\\{\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s*\\{\\s*(#.*)?$"),
+
+    // Single-line block
+    QRegularExpression("^\\s*if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s+if\\s*\\([^\\)]+\\)\\s*\\{.*\\}\\s*(#.*)?$"),
+    QRegularExpression("^\\s*else\\s*\\{.*\\}\\s*(#.*)?$"),
+
+    QRegularExpression("^\\s*end\\s*$"),
+    QRegularExpression("^\\s*\\}\\s*$"),
+
+    // Comentarios y líneas vacías
+    QRegularExpression("^\\s*#.*$"),
+    QRegularExpression("^\\s*$")
+};
+
+
+
 
         for (int i = 0; i < lines.size(); ++i) {
             QString line = lines[i].trimmed();
@@ -157,46 +190,56 @@ private slots:
     }
 
     void compileCode() {
-        if (!checkSyntax()) {
-            QMessageBox::warning(this, "Errores de Sintaxis", "Se encontraron errores en el código. Revise las líneas marcadas.");
-            return;
-        }
-
-        QFile file("test.vg");
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream out(&file);
-            out << editor->toPlainText();
-            file.close();
-
-            QString command = QString(
-                "bash -c 'echo Guardado como test.vg && make && echo Compilación exitosa && ./vgraph < test.vg || echo Error en compilación'\n"
-            );
-
-            terminal->sendText(command);
-        } else {
-            QMessageBox::warning(this, "Error", "No se pudo guardar el archivo test.vg");
-        }
+    bool passed = checkSyntax();
+    if (!passed) {
+        QMessageBox::warning(this, "Advertencia", "Se detectaron errores de sintaxis, pero se continuará con la compilación.");
     }
 
-     void handleTerminalOutput(const QString &text) {
-    QRegularExpression regexWithLine("Syntax Error at line (\\d+):\\s*(.*)");
-    QRegularExpression regexGeneric("syntax error", QRegularExpression::CaseInsensitiveOption);
+    QFile file("test.vg");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << editor->toPlainText();
+        file.close();
 
-    QRegularExpressionMatchIterator i = regexWithLine.globalMatch(text);
-    bool matchedLineError = false;
-
-    while (i.hasNext()) {
-        QRegularExpressionMatch match = i.next();
-        int line = match.captured(1).toInt() - 1;
-        QString message = match.captured(2);
-        highlightLine(line, "Error de compilación: " + message);
-        matchedLineError = true;
-    }
-
-    if (!matchedLineError && regexGeneric.match(text).hasMatch()) {
-        errorPanel->addItem("❌ Error de compilación: syntax error (sin línea específica)");
+        // 🔁 Captura stdout y stderr
+        QString command = QString(
+            "bash -c 'echo Guardado como test.vg && make 2>&1 && echo Compilación exitosa && ./vgraph < test.vg || echo Error en compilación'\n"
+        );
+        terminal->sendText(command);
+    } else {
+        QMessageBox::warning(this, "Error", "No se pudo guardar el archivo test.vg");
     }
 }
+
+void handleTerminalOutput(const QString &text) {
+    terminalBuffer += text;
+
+    int newlineIndex;
+    while ((newlineIndex = terminalBuffer.indexOf('\n')) != -1) {
+        QString rawLine = terminalBuffer.left(newlineIndex);
+        terminalBuffer = terminalBuffer.mid(newlineIndex + 1);
+
+        // 🔤 Corrige tildes mal interpretadas
+        QString line = QString::fromLocal8Bit(rawLine.toUtf8()).trimmed();
+
+        qDebug() << "Línea recibida del compilador:" << line;
+
+        QRegularExpression regexWithLine("Error\\s+de\\s+sintaxis\\s+en\\s+l[ií]nea\\s+(\\d+)[^:]*:\\s*(.*)", QRegularExpression::CaseInsensitiveOption);
+        QRegularExpression regexGeneric("syntax error", QRegularExpression::CaseInsensitiveOption);
+
+        QRegularExpressionMatch match = regexWithLine.match(line);
+        if (match.hasMatch()) {
+            int lineNum = match.captured(1).toInt() - 1;
+            QString message = match.captured(2);
+            highlightLine(lineNum, "Error de compilación: " + message);
+        } else if (regexGeneric.match(line).hasMatch()) {
+            errorPanel->addItem("❌ Error de compilación: syntax error (sin línea específica)");
+        }
+    }
+}
+
+
+
 
 
 
@@ -208,6 +251,8 @@ private:
     QPushButton *saveBtn;
     QPushButton *compileBtn;
     QListWidget *errorPanel;
+    QString terminalBuffer;
+
 };
 
 #include "main.moc"
@@ -218,4 +263,3 @@ int main(int argc, char *argv[]) {
     window.show();
     return app.exec();
 }
-

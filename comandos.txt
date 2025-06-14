@@ -1,0 +1,8 @@
+chmod +x arrancar_vga.sh
+./arrancar_vga.sh
+which docker
+andres ALL=(ALL) NOPASSWD: /usr/bin/docker compose up
+
+
+sudo visudo
+which docker

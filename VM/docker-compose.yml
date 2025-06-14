@@ -8,5 +8,7 @@ services:
         hostname: pkos_dev
         volumes:
             - .:/pkos
-        network_mode: 'host' # makes x11 windows work for `make run`
-        entrypoint: ['make', 'run']
+        network_mode: 'host'
+        entrypoint: ["make", "clean", "run"]
+
+

@@ -2,7 +2,7 @@
 #define __VGA_H
 
 #define VGA_ADDRESS 0xA0000
-
+#define PI 3.14159265358979323846
 
 void vga_clear_screen();
 
@@ -30,7 +30,7 @@ void vga_clear_screen();
 #define	VGA_NUM_GC_REGS		9
 #define	VGA_NUM_SEQ_REGS	5
 
-extern unsigned char g_320x200x256[];
+extern unsigned char g_640x480x16[];
 void write_regs(unsigned char *regs);
 void io_wait(void);
 void tree(int x, int y, double len, double ang, int depth);
@@ -39,10 +39,13 @@ void draw_mandala_frame(int cx, int cy,int t);
 void animate_mandala(int cx, int cy);
 void wait_ticks(int ticks);
 void wait_ms(int ms);
+void draw_spiral_frame(int cx, int cy, int r_max);
 void animate_spiral(int cx, int cy, int radius_max);
-void draw_spiral_frame(int cx, int cy, int t_max);
 void wait(int s);
+int cos_deg(int deg);
 
+static double sin_approx(double x);
+static double cos_approx(double x);
 // end copied code
 
 #endif

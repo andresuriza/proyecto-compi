@@ -1,5 +1,5 @@
-/home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide.dir
-/home/sebas/Documents/proyecto-compi/build/CMakeFiles/edit_cache.dir
-/home/sebas/Documents/proyecto-compi/build/CMakeFiles/rebuild_cache.dir
-/home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir
-/home/sebas/Documents/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir
+/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide.dir
+/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/edit_cache.dir
+/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/rebuild_cache.dir
+/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen_timestamp_deps.dir
+/media/sf_Ubuntu_shared/proyecto-compi/build/CMakeFiles/vgraph_ide_autogen.dir

@@ -15,10 +15,8 @@ void draw_mandala_frame(int cx, int cy,int t);
 void animate_mandala(int cx, int cy);
 void wait_ticks(int ticks);
 void wait_ms(int ms);
-void animate_spiral(int cx, int cy, int radius_max);
-void draw_spiral_frame(int cx, int cy, int t_max);
+void draw_spiral();
 void wait(int s);
-
 
 // =======================
 // FUNCIONES AUXILIARES
@@ -54,41 +52,37 @@ int cos_deg(int deg) {
 }
 
 #define PI 3.14159265358979323846
+
+#define DEG2RAD(a) ((a) * PI / 180.0)
 static inline double deg2rad(double d) {
     return d * PI / 180.0;
 }
 static inline int abs_i(int x) { return x < 0 ? -x : x; }
 /* Taylor simple para sin/cos */
-static double sin_approx(double x) {
+static double cos_approx(double x) {
     double x2 = x*x;
     return x - x*x2/6.0 + x2*x2/120.0 - x2*x2*x2/5040.0;
 }
-static double cos_approx(double x) {
-    return sin_approx(PI/2 - x);
+static double sin_approx(double x) {
+    return cos_approx(PI/2 - x);
 }
 
-unsigned char g_320x200x256[] =
-{
-/* MISC */
-	0x63,
-/* SEQ */
-	0x03, 0x01, 0x0F, 0x00, 0x0E,
-/* CRTC */
-	0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
-	0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x9C, 0x0E, 0x8F, 0x28,	0x40, 0x96, 0xB9, 0xA3,
-	0xFF,
-/* GC */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
-	0xFF,
-/* AC */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	0x41, 0x00, 0x0F, 0x00,	0x00
+unsigned char g_640x480x16[] = {
+    /* MISC */
+    0xE3,
+    /* SEQ (5 bytes) */
+    0x03, 0x01, 0x0F, 0x00, 0x06,
+    /* CRTC (25 bytes) */
+    0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0x0B, 0x3E,
+    0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x59,
+    0xEA, 0x8C, 0xDF, 0x28, 0x00, 0xE7, 0x04, 0xE3, 0xFF,
+    /* GC (9 bytes) */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x0F, 0xFF,
+    /* AC (21 bytes) */
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x14, 0x07,
+    0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
+    0x01, 0x00, 0x0F, 0x00, 0x00
 };
-
-
-
 
 
 
@@ -169,38 +163,38 @@ void animate_mandala(int cx, int cy) {
 }
 
 
-void draw_spiral_frame(int cx, int cy, int r_max) {
-    int r;
-    int r_min = 2; 
-    int r_step = 2;
-    unsigned char c;
-    for (r = r_max; r >= r_min; r -= r_step) {
+void draw_spiral_frame(int cx, int cy, int r_max)
+{
+    const int r_min  = 2;
+    const int r_step = 2;
+    for (int r = r_min; r <= r_max; r += r_step) {
 
-        // Asignar color según t % 3
+        /* Coordenadas polares -> cartesianas                     */
+        /* Radio = t (crece linealmente), ángulo = t en radianes  */
+        int x =  cx + (int)(r * cos_approx(DEG2RAD(r)));
+        int y = cy + (int)(r * sin_approx(DEG2RAD(r)));
+
+        /* Selección de color cíclica rojo‑azul‑verde             */
+        unsigned char c;
         switch (r % 3) {
-            case 0: c = COLOR_RED;    break;
-            case 1: c = COLOR_BLUE;   break;
+            case 0:  c = COLOR_RED;   break;
+            case 1:  c = COLOR_BLUE;  break;
             default: c = COLOR_GREEN; break;
         }
+
         set_color(c);
-        draw_circle(cx, cy,r);
-        wait_ms(1);  // pequeño retraso para suavizar
+        draw_pixel(x,y);
+
     }
 }
 
-/**
- * animate_spiral:
- *   Anima la espiral creciendo hasta radio máximo radius,
- *   limpiando pantalla y redibujando cada paso.
- */
-void animate_spiral(int cx, int cy, int radius_max) {
-    int t;
-    for (t = 0; t <= radius_max; t += 5) {
-        vga_clear_screen();
-        draw_spiral_frame(cx, cy, t);
-        wait_ms(1);  // retardo entre fotogramas
+void animate_spiral(int cx, int cy, int radius_max)
+{
+    for (int r = 0; r <= radius_max; r += 5) {
+        //vga_clear_screen();
+        draw_spiral_frame(cx, cy, r);
     }
-    // Para dejar la espiral completa sin borrar
+    
     draw_spiral_frame(cx, cy, radius_max);
 }
 

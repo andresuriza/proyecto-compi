@@ -1,13 +1,29 @@
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
+typedef enum { SYM_NUMBER, SYM_COLOR } SymbolType;
+
+typedef enum {
+    ROJO,
+    VERDE,
+    AZUL,
+    NEGRO,
+    CYAN,
+    MAGENTA,
+    CAFE,
+    GRIS,
+    AMARILLO,
+    BLANCO,
+    MARRON
+} ColorValue;
 
 /* constants */
 typedef struct {
-    double value;                  /* value of constant */
+    double value; 
+    SymbolType type;  
 } conNodeType;
 
 /* identifiers */
 typedef struct {
-    int i;                      /* subscript to sym array */
+    char* name;  
 } idNodeType;
 
 /* operators */
@@ -27,4 +43,14 @@ typedef struct nodeTypeTag {
     };
 } nodeType;
 
-extern double sym[26];
+typedef struct Symbol {
+    char *name;
+    SymbolType type;
+    union {
+        double number;
+        ColorValue color;
+    } value;
+    struct Symbol *next;
+} Symbol;
+
+extern Symbol *symbolTable;
