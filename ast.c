@@ -65,36 +65,46 @@ void getColor(FILE *out, ColorValue c) {
     switch(c) {
         case ROJO:
             printf("Rojo \n");
+            fprintf(out, "set_color(COLOR_RED);\n");
             break;
         case AZUL:
             printf("Azul \n");
+            fprintf(out, "set_color(COLOR_BLUE);\n");
             break;
         case VERDE:
             printf("Verde \n");
+            fprintf(out, "set_color(COLOR_GREEN);\n");
             break;
         case NEGRO:
             printf("Negro \n");
+            fprintf(out, "set_color(COLOR_BLACK);\n");
             break;
         case CYAN:
             printf("CYAN \n");
+            fprintf(out, "set_color(COLOR_CYAN);\n");
             break;
         case MAGENTA:
             printf("MAGENTA \n");
+            fprintf(out, "set_color(COLOR_MAGENTA);\n");
             break;
         case CAFE:
             printf("CAFE \n");
+            fprintf(out, "set_color(COLOR_BROWN);\n");
             break;
         case GRIS:
             printf("GRIS \n");
+             fprintf(out, "set_color(COLOR_DARK_GRAY);\n");
             break;
         case AMARILLO:
-            printf("AMARIALLO \n");
+            printf("AMARILLO \n");
+             fprintf(out, "set_color(COLOR_YELLOW);\n");
             break;
         case BLANCO:
             fprintf(out, "set_color(COLOR_WHITE);\n");
             break;
         case MARRON:
             printf("MARRON \n");
+            fprintf(out, "set_color(COLOR_BROWN);\n");
             break;
     }
 }
@@ -120,10 +130,10 @@ double ex(nodeType *p, FILE *out) {
                         //fprintf(f, "set_color(%s) \n", getColor(s->value.color));
                         getColor(out, s->value.color);
                         return 0;
-            case WAIT: printf("Waiting: %f \n", ex(p->opr.op[0], out)); return 0;
+            case WAIT: fprintf(out, "wait(%f);\n", ex(p->opr.op[0], out)); return 0;
             case FUNC: return 0;
             case PIXEL: 
-                        printf("drawing at: (%f, %f) \n", ex(p->opr.op[0], out), ex(p->opr.op[1], out)); 
+                        fprintf(out, "draw_pixel(%f, %f);\n", ex(p->opr.op[0], out), ex(p->opr.op[1], out)); 
                         return 0;
             case LINE: 
                         //printf("drawing at: (%f, %f, %f, %f) \n", ex(p->opr.op[0]), ex(p->opr.op[1]), ex(p->opr.op[2]), ex(p->opr.op[3])); 
@@ -131,10 +141,10 @@ double ex(nodeType *p, FILE *out) {
                         //printf("draw_line(%f, %f, %f, %f);\n", ex(p->opr.op[0]), ex(p->opr.op[1]), ex(p->opr.op[2]), ex(p->opr.op[3]));
                         return 0;
             case CIRCLE: 
-                        printf("drawing at: (%f, %f, %f) \n", ex(p->opr.op[0], out), ex(p->opr.op[1], out), ex(p->opr.op[2], out)); 
+                        fprintf(out, "draw_circle(%f, %f, %f);\n", ex(p->opr.op[0], out), ex(p->opr.op[1], out), ex(p->opr.op[2], out)); 
                         return 0;
             case RECT: 
-                        printf("drawing at: (%f, %f, %f, %f) \n", ex(p->opr.op[0], out), ex(p->opr.op[1], out), ex(p->opr.op[2], out), ex(p->opr.op[3], out)); 
+                        fprintf(out, "draw_rect(%f, %f, %f, %f);\n", ex(p->opr.op[0], out), ex(p->opr.op[1], out), ex(p->opr.op[2], out), ex(p->opr.op[3], out)); 
                         return 0;
             case ';':       ex(p->opr.op[0], out); return ex(p->opr.op[1], out);
             case C_DECL: {
